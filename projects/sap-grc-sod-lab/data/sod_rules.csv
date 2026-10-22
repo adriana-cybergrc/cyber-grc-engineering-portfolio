@@ -1,0 +1,3 @@
+rule_id,rule_name,function_a,function_b,risk_level,description
+SOD001,Vendor Creation vs Payment Approval,CREATE_VENDOR,APPROVE_PAYMENT,HIGH,Same user can create vendors and approve payments
+SOD002,Vendor Creation vs Vendor Change,CREATE_VENDOR,CHANGE_VENDOR,MEDIUM,Same user can create and modify vendor records

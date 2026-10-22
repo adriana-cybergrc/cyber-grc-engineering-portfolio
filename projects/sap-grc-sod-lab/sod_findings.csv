@@ -1,0 +1,4 @@
+user_id,rule_id,rule_name,risk_level,function_a,function_b,status
+USR001,SOD001,Vendor Creation vs Payment Approval,HIGH,CREATE_VENDOR,APPROVE_PAYMENT,REQUIRES_REVIEW
+USR001,SOD002,Vendor Creation vs Vendor Change,MEDIUM,CREATE_VENDOR,CHANGE_VENDOR,REQUIRES_REVIEW
+USR005,SOD002,Vendor Creation vs Vendor Change,MEDIUM,CREATE_VENDOR,CHANGE_VENDOR,REQUIRES_REVIEW
