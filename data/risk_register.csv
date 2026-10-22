@@ -1,0 +1,5 @@
+risk_id,scenario,asset,probability,impact,owner,status,treatment
+R-001,Unauthorized privileged access,Identity platform,4,5,Identity Team,Open,Mitigate
+R-002,Unverified supplier security evidence,Third-party service,3,4,Third-Party Risk,In Treatment,Mitigate
+R-003,AI output used without human review,AI-assisted workflow,3,5,AI Governance,Open,Mitigate
+R-004,Delayed remediation of critical vulnerability,Server estate,4,5,Vulnerability Management,In Treatment,Mitigate
