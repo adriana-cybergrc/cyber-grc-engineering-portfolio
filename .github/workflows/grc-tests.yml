@@ -1,0 +1,48 @@
+
+name: Cyber GRC Quality Checks
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "projects/grc-automation-lab/**"
+      - ".github/workflows/grc-tests.yml"
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "projects/grc-automation-lab/**"
+      - ".github/workflows/grc-tests.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run GRC automated tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Verify Python
+        run: python --version
+
+      - name: Run automated tests
+        run: |
+          python -W error::ResourceWarning -m unittest discover \
+            -s projects/grc-automation-lab/tests -v
+
+      - name: Check Python compilation
+        run: |
+          python -m compileall -q projects/grc-automation-lab/src
