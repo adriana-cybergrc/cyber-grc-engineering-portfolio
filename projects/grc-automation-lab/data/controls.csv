@@ -1,0 +1,6 @@
+control_id,control_name,framework,owner,required_evidence,active
+CTRL001,Access Review,ISO 27001,IT Security,Access review report,true
+CTRL002,Vulnerability Management,NIST CSF 2.0,Security Operations,Vulnerability scan report,true
+CTRL003,Security Awareness,ISO 27001,HR,Training completion report,true
+CTRL004,Backup and Recovery,NIST CSF 2.0,IT Operations,Backup restoration test,true
+CTRL005,AI Risk Assessment,NIST AI RMF,AI Governance,AI risk assessment report,true

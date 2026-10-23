@@ -1,0 +1,6 @@
+task_id,control_id,task_name,owner,due_date,status
+TASK001,CTRL001,Complete access review,IT Security,2026-10-20,Completed
+TASK002,CTRL002,Remediate vulnerability findings,Security Operations,2026-10-22,In Progress
+TASK003,CTRL003,Complete awareness campaign,HR,2026-10-20,Pending
+TASK004,CTRL004,Execute backup recovery test,IT Operations,2026-10-30,In Progress
+TASK005,CTRL005,Complete AI risk assessment,AI Governance,2026-10-21,Pending

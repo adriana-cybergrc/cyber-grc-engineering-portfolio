@@ -1,0 +1,7 @@
+control_id,control_name,finding_type,severity,details
+CTRL002,Vulnerability Management,EVIDENCE_EXPIRED,HIGH,Evidence EV002 expired on 2026-10-01.
+CTRL002,Vulnerability Management,SLA_OVERDUE,HIGH,Task TASK002 is In Progress and was due on 2026-10-22.
+CTRL003,Security Awareness,EVIDENCE_NOT_SUBMITTED,HIGH,Evidence EV003 status is Pending.
+CTRL003,Security Awareness,SLA_OVERDUE,HIGH,Task TASK003 is Pending and was due on 2026-10-20.
+CTRL005,AI Risk Assessment,MISSING_EVIDENCE,HIGH,No evidence record exists for this control.
+CTRL005,AI Risk Assessment,SLA_OVERDUE,HIGH,Task TASK005 is Pending and was due on 2026-10-21.
