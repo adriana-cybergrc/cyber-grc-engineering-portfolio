@@ -1,7 +1,6 @@
+
 import tempfile
 import unittest
-import gc
-import time
 from pathlib import Path
 from importlib.util import module_from_spec, spec_from_file_location
 
@@ -18,17 +17,7 @@ class TestAuditStore(unittest.TestCase):
         audit_store.initialize_database(self.db_path)
 
     def tearDown(self):
-        # Libera referências pendentes antes de remover o banco no Windows.
-        gc.collect()
-
-        for attempt in range(3):
-            try:
-                self.temp_dir.cleanup()
-                break
-            except PermissionError:
-                if attempt == 2:
-                    raise
-                time.sleep(0.2)
+        self.temp_dir.cleanup()
 
     def test_saves_run_and_findings(self):
         findings = [{
@@ -38,9 +27,7 @@ class TestAuditStore(unittest.TestCase):
             "details": "Synthetic evidence has expired.",
         }]
 
-        run_id = audit_store.save_audit_run(
-            self.db_path, 5, findings
-        )
+        run_id = audit_store.save_audit_run(self.db_path, 5, findings)
         history = audit_store.get_audit_history(self.db_path)
         saved_findings = audit_store.get_findings_for_run(
             self.db_path, run_id
@@ -50,9 +37,7 @@ class TestAuditStore(unittest.TestCase):
         self.assertEqual(history[0]["controls_evaluated"], 5)
         self.assertEqual(history[0]["findings_count"], 1)
         self.assertEqual(len(saved_findings), 1)
-        self.assertEqual(
-            saved_findings[0]["finding_type"], "EVIDENCE_EXPIRED"
-        )
+        self.assertEqual(saved_findings[0]["finding_type"], "EVIDENCE_EXPIRED")
 
     def test_saves_run_with_no_findings(self):
         run_id = audit_store.save_audit_run(self.db_path, 5, [])
