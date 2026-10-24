@@ -90,6 +90,106 @@ class TestGRCDashboard(unittest.TestCase):
         self.assertIn("EVIDENCE_EXPIRED", content)
         self.assertIn("NOT_PRESENT_IN_LATEST", content)
 
+    def test_displays_operational_exposure_and_remediation_caveat(self):
+        self.write_csv(
+            "operational_metrics.csv",
+            [
+                "item_type", "item_id", "control_id", "issue_type",
+                "status", "due_date", "days_overdue", "owner",
+                "remediation_status",
+            ],
+            [
+                [
+                    "TASK", "TASK003", "CTRL003", "SLA_OVERDUE",
+                    "Pending", "2026-10-20", "3", "HR", "NOT_TRACKED",
+                ],
+                [
+                    "EVIDENCE", "EV002", "CTRL002", "EVIDENCE_EXPIRED",
+                    "Submitted", "2026-10-01", "22", "", "NOT_TRACKED",
+                ],
+            ],
+        )
+
+        output = dashboard.build_dashboard(self.analytics_dir)
+        content = output.read_text(encoding="utf-8")
+
+        self.assertIn("Evidence issues", content)
+        self.assertIn("Overdue tasks", content)
+        self.assertIn("Days overdue", content)
+        self.assertIn("NOT_TRACKED", content)
+        self.assertIn("does not independently validate remediation", content)
+
+    def test_displays_formal_remediation_register_and_validated_count(self):
+        self.write_csv(
+            "remediation_register.csv",
+            [
+                "control_id", "finding_type", "owner", "corrective_action",
+                "evidence_reference", "validated_at", "verification_result",
+                "remediation_status", "updated_at",
+            ],
+            [
+                [
+                    "CTRL002", "EVIDENCE_EXPIRED", "Security Governance",
+                    "Replace expired report", "evidence/EV002.pdf",
+                    "2026-10-23T10:00:00+00:00", "PASS", "VALIDATED",
+                    "2026-10-23T10:01:00+00:00",
+                ],
+            ],
+        )
+
+        output = dashboard.build_dashboard(self.analytics_dir)
+        content = output.read_text(encoding="utf-8")
+
+        self.assertIn("Formal remediation register", content)
+        self.assertIn("Security Governance", content)
+        self.assertIn("Validated remediations", content)
+        self.assertIn("evidence/EV002.pdf", content)
+
+    def test_rejects_validated_claim_when_verification_fails(self):
+        row = {
+            "verification_result": "FAIL",
+            "evidence_reference": "evidence/EV002.pdf",
+            "validated_at": "2026-10-23T10:00:00+00:00",
+            "remediation_status": "VALIDATED",
+        }
+
+        status = dashboard.formal_remediation_status(row)
+
+        self.assertEqual(status, "REJECTED")
+
+    def test_pass_without_evidence_is_not_validated(self):
+        row = {
+            "verification_result": "PASS",
+            "evidence_reference": "",
+            "validated_at": "2026-10-23T10:00:00+00:00",
+            "remediation_status": "VALIDATED",
+        }
+
+        status = dashboard.formal_remediation_status(row)
+
+        self.assertEqual(status, "PENDING_VALIDATION")
+
+    def test_pass_without_timezone_aware_timestamp_is_not_validated(self):
+        row = {
+            "verification_result": "PASS",
+            "evidence_reference": "evidence/EV002.pdf",
+            "validated_at": "2026-10-23T10:00:00",
+            "remediation_status": "VALIDATED",
+        }
+
+        status = dashboard.formal_remediation_status(row)
+
+        self.assertEqual(status, "PENDING_VALIDATION")
+
+    def test_missing_operational_metrics_are_reported_as_unavailable(self):
+        metrics_file = self.analytics_dir / "operational_metrics.csv"
+        self.assertFalse(metrics_file.exists())
+
+        output = dashboard.build_dashboard(self.analytics_dir)
+        content = output.read_text(encoding="utf-8")
+
+        self.assertIn("N/A", content)
+
     def test_escapes_untrusted_csv_content(self):
         self.write_csv(
             "latest_comparison.csv",

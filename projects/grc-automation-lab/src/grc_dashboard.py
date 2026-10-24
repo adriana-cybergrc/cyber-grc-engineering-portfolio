@@ -4,6 +4,7 @@
 import argparse
 import csv
 import html
+from datetime import datetime
 from pathlib import Path
 
 
@@ -31,6 +32,46 @@ def number(row: dict[str, str], key: str) -> int:
         return int(row.get(key, "0") or "0")
     except (TypeError, ValueError):
         return 0
+
+
+def has_valid_timestamp(value: object) -> bool:
+    """Return True only for ISO 8601 timestamps with a UTC offset."""
+    if not isinstance(value, str) or not value.strip():
+        return False
+
+    timestamp = value.strip()
+    if timestamp.endswith("Z"):
+        timestamp = timestamp[:-1] + "+00:00"
+
+    try:
+        parsed = datetime.fromisoformat(timestamp)
+    except ValueError:
+        return False
+
+    return parsed.tzinfo is not None and parsed.utcoffset() is not None
+
+
+def formal_remediation_status(row: dict[str, str]) -> str:
+    """Derive remediation status from verification fields, not CSV status."""
+    result = (row.get("verification_result") or "").strip().upper()
+    evidence = (row.get("evidence_reference") or "").strip()
+    validated_at = (row.get("validated_at") or "").strip()
+
+    if result == "PASS":
+        if evidence and has_valid_timestamp(validated_at):
+            return "VALIDATED"
+        return "PENDING_VALIDATION"
+
+    if result == "FAIL":
+        return "REJECTED"
+
+    if result == "PENDING" and evidence:
+        return "PENDING_VALIDATION"
+
+    if result == "PENDING":
+        return "IN_REMEDIATION"
+
+    return "NOT_TRACKED"
 
 
 def make_table(
@@ -79,7 +120,7 @@ def severity_bars(run: dict[str, str]) -> str:
             f'<span class="bar-label">{safe(label)}</span>'
             '<div class="bar-track"><div class="bar-fill" '
             f'style="width:{width:.1f}%"></div></div>'
-            f'<strong>{value}</strong></div>'
+            f"<strong>{value}</strong></div>"
         )
     return "\n".join(bars)
 
@@ -89,6 +130,17 @@ def build_dashboard(analytics_dir: Path) -> Path:
     runs = read_csv(analytics_dir / "execution_summary.csv")
     comparisons = read_csv(analytics_dir / "latest_comparison.csv")
     recurring = read_csv(analytics_dir / "recurring_findings.csv")
+
+    remediation_path = analytics_dir / "remediation_register.csv"
+    remediations = (
+        read_csv(remediation_path) if remediation_path.exists() else []
+    )
+
+    operational_path = analytics_dir / "operational_metrics.csv"
+    operational_available = operational_path.exists()
+    operational = (
+        read_csv(operational_path) if operational_available else []
+    )
 
     runs.sort(key=lambda row: number(row, "run_id"))
     latest = runs[-1] if runs else {
@@ -149,13 +201,109 @@ def build_dashboard(analytics_dir: Path) -> Path:
         status = row.get("status", "UNKNOWN")
         status_counts[status] = status_counts.get(status, 0) + 1
 
-    recurring_count = status_counts.get("RECURRING", 0)
+    recurring_count = sum(
+        1
+        for row in recurring
+        if number(row, "occurrences") >= 2
+        and number(row, "latest_run_id") == number(latest, "run_id")
+    )
     new_count = status_counts.get("NEW", 0)
     not_present_count = status_counts.get("NOT_PRESENT_IN_LATEST", 0)
 
-    generated_at = __import__("datetime").datetime.now().astimezone().isoformat(
-        timespec="seconds"
+    # Missing operational data must not be represented as zero exposure.
+    evidence_issues = (
+        sum(1 for row in operational if row.get("item_type") == "EVIDENCE")
+        if operational_available
+        else None
     )
+    overdue_tasks = [
+        row
+        for row in operational
+        if row.get("item_type") == "TASK"
+        and row.get("issue_type") == "SLA_OVERDUE"
+    ]
+    max_days_overdue = (
+        max(
+            (number(row, "days_overdue") for row in operational),
+            default=0,
+        )
+        if operational_available
+        else None
+    )
+
+    # Never trust a precomputed VALIDATED status without checking its fields.
+    remediation_statuses = [
+        formal_remediation_status(row) for row in remediations
+    ]
+    validated_count = sum(
+        1 for status in remediation_statuses if status == "VALIDATED"
+    )
+    pending_validation_count = sum(
+        1
+        for status in remediation_statuses
+        if status == "PENDING_VALIDATION"
+    )
+
+    operational_rows = [
+        [
+            row.get("item_type", ""),
+            row.get("item_id", ""),
+            row.get("control_id", ""),
+            row.get("issue_type", ""),
+            row.get("status", ""),
+            row.get("due_date", ""),
+            row.get("days_overdue", ""),
+            row.get("owner", ""),
+            row.get("remediation_status", "NOT_TRACKED"),
+        ]
+        for row in sorted(
+            operational,
+            key=lambda item: number(item, "days_overdue"),
+            reverse=True,
+        )
+    ]
+
+    remediation_rows = [
+        [
+            row.get("control_id", ""),
+            row.get("finding_type", ""),
+            row.get("owner", ""),
+            row.get("corrective_action", ""),
+            row.get("evidence_reference", ""),
+            row.get("validated_at", ""),
+            row.get("verification_result", ""),
+            formal_remediation_status(row),
+        ]
+        for row in remediations
+    ]
+
+    if operational_available:
+        evidence_kpi = str(evidence_issues)
+        overdue_kpi = str(len(overdue_tasks))
+        max_overdue_kpi = str(max_days_overdue)
+        operational_empty_message = (
+            "Operational metrics were generated; no evidence issues or "
+            "overdue tasks were identified."
+            if not operational
+            else "No operational rows to display."
+        )
+        operational_note = (
+            "Operational metrics are available. Days overdue use the "
+            "reference date applied by the analytics process."
+        )
+    else:
+        evidence_kpi = "N/A"
+        overdue_kpi = "N/A"
+        max_overdue_kpi = "N/A"
+        operational_empty_message = (
+            "Operational metrics were not generated. Exposure cannot be "
+            "determined from the available data."
+        )
+        operational_note = (
+            "Operational metrics unavailable. N/A means unknown, not zero."
+        )
+
+    generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
 
     html_document = f"""<!DOCTYPE html>
 <html lang="en">
@@ -233,6 +381,21 @@ footer {{ color: #68778b; font-size: 12px; padding: 12px 0 28px; }}
   <div class="card"><div class="kpi-label">Distinct finding types</div>
     <div class="kpi-value">{number(latest, "distinct_finding_types")}</div>
     <div class="kpi-note">Latest execution</div></div>
+  <div class="card"><div class="kpi-label">Evidence issues</div>
+    <div class="kpi-value">{evidence_kpi}</div>
+    <div class="kpi-note">Missing, pending or expired evidence; N/A means unavailable</div></div>
+  <div class="card"><div class="kpi-label">Overdue tasks</div>
+    <div class="kpi-value">{overdue_kpi}</div>
+    <div class="kpi-note">Open tasks past their due date; N/A means unavailable</div></div>
+  <div class="card"><div class="kpi-label">Maximum days overdue</div>
+    <div class="kpi-value">{max_overdue_kpi}</div>
+    <div class="kpi-note">Based on available operational metrics</div></div>
+  <div class="card"><div class="kpi-label">Validated remediations</div>
+    <div class="kpi-value">{validated_count}</div>
+    <div class="kpi-note">PASS + valid timezone-aware timestamp + evidence reference</div></div>
+  <div class="card"><div class="kpi-label">Pending validation</div>
+    <div class="kpi-value">{pending_validation_count}</div>
+    <div class="kpi-note">Corrective action recorded but not formally validated</div></div>
 </section>
 
 <section class="two-col">
@@ -260,6 +423,17 @@ footer {{ color: #68778b; font-size: 12px; padding: 12px 0 28px; }}
 </section>
 
 <section class="panel">
+  <h2>Evidence and SLA exposure</h2>
+  <p class="kpi-note">{safe(operational_note)}</p>
+  {make_table(
+      ["Item type", "Item ID", "Control", "Issue", "Status",
+       "Due / expiry date", "Days overdue", "Owner", "Remediation"],
+      operational_rows,
+      operational_empty_message,
+  )}
+</section>
+
+<section class="panel">
   <h2>Recurring findings by control</h2>
   {make_table(
       ["Control", "Finding type", "Occurrences",
@@ -267,6 +441,17 @@ footer {{ color: #68778b; font-size: 12px; padding: 12px 0 28px; }}
       recurring_rows,
       "No recurring findings recorded."
   )}
+</section>
+
+<section class="panel">
+  <h2>Formal remediation register</h2>
+  {make_table(
+      ["Control", "Finding type", "Owner", "Corrective action",
+       "Evidence reference", "Validated at", "Verification result", "Status"],
+      remediation_rows,
+      "No remediation records have been entered. Items remain NOT_TRACKED until a record is created."
+  )}
+  <p class="kpi-note">VALIDATED requires verification result PASS, a non-empty evidence reference and an ISO 8601 timestamp with timezone. The displayed status is derived from these fields, not from the CSV status column.</p>
 </section>
 
 <section class="panel">
@@ -283,8 +468,14 @@ footer {{ color: #68778b; font-size: 12px; padding: 12px 0 28px; }}
   <strong>Governance interpretation:</strong>
   A finding marked NOT_PRESENT_IN_LATEST is not proof of remediation.
   Closure requires evidence of corrective action and validation against
-  the relevant control. This dashboard summarizes recorded findings;
-  it does not independently validate remediation or calculate residual risk.
+  the relevant control. Remediation status is NOT_TRACKED until a remediation
+  record is entered. A record is considered VALIDATED only when the result is
+  PASS, a timezone-aware validation timestamp is present, and an evidence
+  reference is recorded. Operational metrics marked N/A were not available;
+  this does not mean that no exposure exists. This dashboard summarizes
+  recorded data and does not independently validate remediation or verify
+  evidence, and it does not calculate residual risk. The SQLite history
+  records events but is not immutable against direct database modification.
 </section>
 
 <footer>

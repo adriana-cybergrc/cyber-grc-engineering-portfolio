@@ -1,12 +1,17 @@
 import argparse
 import csv
+from contextlib import closing
 import sqlite3
+import sys
+from datetime import date, datetime
 from collections import Counter
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from remediation_store import load_remediations
 
 
 def load_history(db_path):
-    with sqlite3.connect(db_path) as connection:
+    with closing(sqlite3.connect(db_path)) as connection:
         connection.row_factory = sqlite3.Row
 
         runs = [
@@ -36,6 +41,7 @@ def finding_signature(finding):
     return finding["control_id"], finding["finding_type"]
 
 
+
 def analyze_history(runs, findings):
     findings_by_run = {run["run_id"]: [] for run in runs}
 
@@ -63,6 +69,7 @@ def analyze_history(runs, findings):
         })
 
     latest_comparison = []
+
     if len(runs) >= 2:
         previous_id = runs[-2]["run_id"]
         latest_id = runs[-1]["run_id"]
@@ -109,37 +116,152 @@ def analyze_history(runs, findings):
                 "details": item["details"],
             })
 
-    recurring_counts = Counter(
-        finding_signature(item) for item in findings
-    )
-    latest_run_id = runs[-1]["run_id"] if runs else None
+    # Count each finding signature once per distinct execution.
+    runs_by_signature = {}
 
+    for finding in findings:
+        signature = finding_signature(finding)
+        runs_by_signature.setdefault(signature, set()).add(
+            finding["run_id"]
+        )
+
+    latest_run_id = runs[-1]["run_id"] if runs else None
     recurring = []
-    for signature, count in recurring_counts.most_common():
-        if count < 2:
+
+    for signature, run_ids in sorted(
+        runs_by_signature.items(),
+        key=lambda entry: (-len(entry[1]), entry[0]),
+    ):
+        if len(run_ids) < 2:
             continue
 
         control_id, finding_type = signature
-        matching = [
-            item for item in findings
+
+        latest_matches = [
+            item
+            for item in findings_by_run.get(latest_run_id, [])
             if finding_signature(item) == signature
         ]
+
+        last_observed_run_id = (
+            latest_matches[-1]["run_id"] if latest_matches else max(run_ids)
+        )
+        last_observed_matches = [
+            item for item in findings_by_run.get(last_observed_run_id, [])
+            if finding_signature(item) == signature
+        ]
+        latest_severity = (
+            last_observed_matches[-1]["severity"]
+            if last_observed_matches else ""
+        )
+
         recurring.append({
             "control_id": control_id,
             "finding_type": finding_type,
-            "occurrences": count,
-            "latest_run_id": latest_run_id,
-            "latest_severity": next(
-                (
-                    item["severity"]
-                    for item in reversed(matching)
-                    if item["run_id"] == latest_run_id
-                ),
-                "",
-            ),
+            "occurrences": len(run_ids),
+            "latest_run_id": last_observed_run_id,
+            "latest_severity": latest_severity,
         })
 
     return summary, latest_comparison, recurring
+
+
+
+def load_operational_metrics(data_dir, reference_date, findings=None, remediation_records=None):
+    """Summarize synthetic evidence and task exposure at a fixed reference date."""
+    metrics = []
+    remediation_lookup = {
+        (item["control_id"], item["finding_type"]): item
+        for item in (remediation_records or [])
+    }
+
+    def status_for(control_id, finding_type):
+        record = remediation_lookup.get((control_id, finding_type))
+        return record.get("remediation_status", "NOT_TRACKED") if record else "NOT_TRACKED"
+
+    evidence_path = data_dir / "evidence.csv"
+    if evidence_path.exists():
+        with evidence_path.open("r", encoding="utf-8-sig", newline="") as file:
+            for item in csv.DictReader(file):
+                status = (item.get("status") or "").strip().lower()
+                expiry_text = (item.get("expiry_date") or "").strip()
+                days_overdue = 0
+                expired = False
+                if expiry_text:
+                    try:
+                        expiry = date.fromisoformat(expiry_text)
+                        expired = expiry < reference_date
+                        days_overdue = max((reference_date - expiry).days, 0)
+                    except ValueError:
+                        pass
+                if status != "submitted" or expired:
+                    if status != "submitted":
+                        issue_type = "EVIDENCE_NOT_SUBMITTED"
+                    else:
+                        issue_type = "EVIDENCE_EXPIRED"
+                    metrics.append({
+                        "item_type": "EVIDENCE",
+                        "item_id": item.get("evidence_id", ""),
+                        "control_id": item.get("control_id", ""),
+                        "issue_type": issue_type,
+                        "status": item.get("status", ""),
+                        "due_date": expiry_text,
+                        "days_overdue": days_overdue,
+                        "owner": "",
+                        "remediation_status": status_for(item.get("control_id", ""), issue_type),
+                    })
+
+    tasks_path = data_dir / "tasks.csv"
+    if tasks_path.exists():
+        with tasks_path.open("r", encoding="utf-8-sig", newline="") as file:
+            for item in csv.DictReader(file):
+                status = (item.get("status") or "").strip().lower()
+                due_text = (item.get("due_date") or "").strip()
+                if status == "completed" or not due_text:
+                    continue
+                try:
+                    due = date.fromisoformat(due_text)
+                except ValueError:
+                    continue
+                if due < reference_date:
+                    metrics.append({
+                        "item_type": "TASK",
+                        "item_id": item.get("task_id", ""),
+                        "control_id": item.get("control_id", ""),
+                        "issue_type": "SLA_OVERDUE",
+                        "status": item.get("status", ""),
+                        "due_date": due_text,
+                        "days_overdue": (reference_date - due).days,
+                        "owner": item.get("owner", ""),
+                        "remediation_status": status_for(item.get("control_id", ""), "SLA_OVERDUE"),
+                    })
+
+    # Include controls with a missing-evidence finding even when no evidence
+    # row exists in evidence.csv; that absence is itself the exposure.
+    existing_evidence_controls = {
+        row.get("control_id", "")
+        for row in metrics
+        if row.get("item_type") == "EVIDENCE"
+    }
+    for finding in findings or []:
+        if (
+            finding.get("finding_type") == "MISSING_EVIDENCE"
+            and finding.get("control_id") not in existing_evidence_controls
+        ):
+            metrics.append({
+                "item_type": "EVIDENCE",
+                "item_id": "NO_RECORD",
+                "control_id": finding.get("control_id", ""),
+                "issue_type": "MISSING_EVIDENCE",
+                "status": "NO_RECORD",
+                "due_date": "",
+                "days_overdue": 0,
+                "owner": "",
+                "remediation_status": status_for(finding.get("control_id", ""), "MISSING_EVIDENCE"),
+            })
+            existing_evidence_controls.add(finding.get("control_id", ""))
+
+    return metrics
 
 
 def write_csv(path, rows, columns):
@@ -266,6 +388,42 @@ def main():
 
     runs, findings = load_history(db_path)
     summary, comparison, recurring = analyze_history(runs, findings)
+
+    reference_date = date.today()
+    if runs:
+        try:
+            reference_date = datetime.fromisoformat(
+                runs[-1]["executed_at"].replace("Z", "+00:00")
+            ).date()
+        except (ValueError, TypeError):
+            pass
+
+    project_dir = Path(__file__).resolve().parents[1]
+    latest_run_id = runs[-1]["run_id"] if runs else None
+    latest_findings = [
+        item for item in findings if item.get("run_id") == latest_run_id
+    ]
+    remediation_records = load_remediations(db_path)
+    operational_metrics = load_operational_metrics(
+        project_dir / "data", reference_date, latest_findings, remediation_records
+    )
+
+    write_csv(
+        output_dir / "remediation_register.csv",
+        remediation_records,
+        ["control_id", "finding_type", "owner", "corrective_action",
+         "evidence_reference", "validated_at", "verification_result",
+         "remediation_status", "updated_at"],
+    )
+
+    write_csv(
+        output_dir / "operational_metrics.csv",
+        operational_metrics,
+        [
+            "item_type", "item_id", "control_id", "issue_type", "status",
+            "due_date", "days_overdue", "owner", "remediation_status",
+        ],
+    )
 
     write_csv(
         output_dir / "execution_summary.csv",
