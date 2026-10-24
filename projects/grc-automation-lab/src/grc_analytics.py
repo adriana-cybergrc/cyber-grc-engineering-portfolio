@@ -378,10 +378,16 @@ def main():
         "--output-dir",
         default="projects/grc-automation-lab/runtime/analytics",
     )
+    parser.add_argument(
+        "--data-dir",
+        default="projects/grc-automation-lab/data",
+        help="Directory containing operational evidence and task CSV files",
+    )
     args = parser.parse_args()
 
     db_path = Path(args.database)
     output_dir = Path(args.output_dir)
+    data_dir = Path(args.data_dir)
 
     if not db_path.exists():
         raise SystemExit(f"Database not found: {db_path}")
@@ -405,7 +411,10 @@ def main():
     ]
     remediation_records = load_remediations(db_path)
     operational_metrics = load_operational_metrics(
-        project_dir / "data", reference_date, latest_findings, remediation_records
+        data_dir,
+        reference_date,
+        latest_findings,
+        remediation_records,
     )
 
     write_csv(

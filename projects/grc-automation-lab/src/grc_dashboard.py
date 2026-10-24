@@ -223,9 +223,9 @@ def build_dashboard(analytics_dir: Path) -> Path:
         and row.get("issue_type") == "SLA_OVERDUE"
     ]
     max_days_overdue = (
-        max(
-            (number(row, "days_overdue") for row in operational),
-            default=0,
+       max(
+           (number(row, "days_overdue") for row in overdue_tasks),
+           default=0,
         )
         if operational_available
         else None
