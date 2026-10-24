@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Executive GRC Dashboard</title>
+<style>
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #182230;
+  background: #f3f5f8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+header { background: #172b4d; color: white; padding: 28px 5%; }
+header h1 { margin: 0 0 8px; font-size: 28px; }
+header p { margin: 4px 0; color: #dbe5f3; }
+main { max-width: 1400px; margin: auto; padding: 24px; }
+h2 { font-size: 19px; margin: 0 0 16px; }
+section { margin-bottom: 26px; }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+         gap: 14px; }
+.card, .panel { background: white; border: 1px solid #dfe5ed;
+                 border-radius: 10px; padding: 18px; }
+.kpi-label { color: #596579; font-size: 13px; }
+.kpi-value { font-size: 30px; font-weight: 700; margin-top: 8px; }
+.kpi-note { color: #68778b; font-size: 12px; margin-top: 6px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.bar-row { display: grid; grid-template-columns: 75px 1fr 28px;
+            gap: 10px; align-items: center; margin: 15px 0; }
+.bar-label { font-size: 13px; }
+.bar-track { height: 12px; background: #e8edf3; border-radius: 8px;
+              overflow: hidden; }
+.bar-fill { height: 100%; background: #4169a1; border-radius: 8px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 10px; border-bottom: 1px solid #e6eaf0;
+          text-align: left; vertical-align: top; }
+th { background: #f6f8fb; white-space: nowrap; }
+td { overflow-wrap: anywhere; }
+.note { border-left: 4px solid #c18a28; background: #fff8e8;
+         padding: 14px; line-height: 1.5; }
+footer { color: #68778b; font-size: 12px; padding: 12px 0 28px; }
+@media (max-width: 800px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .two-col { grid-template-columns: 1fr; }
+  main { padding: 14px; }
+}
+@media (max-width: 420px) {
+  .kpis { grid-template-columns: 1fr 1fr; }
+  .kpi-value { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Executive GRC Dashboard</h1>
+  <p>Cybersecurity controls, evidence and remediation oversight</p>
+  <p>Latest execution: #6 ·
+     2026-10-23T15:00:57+00:00</p>
+</header>
+<main>
+<section class="kpis">
+  <div class="card"><div class="kpi-label">Controls evaluated</div>
+    <div class="kpi-value">5</div>
+    <div class="kpi-note">Latest execution</div></div>
+  <div class="card"><div class="kpi-label">Open findings in report</div>
+    <div class="kpi-value">6</div>
+    <div class="kpi-note">Latest execution</div></div>
+  <div class="card"><div class="kpi-label">Recurring findings</div>
+    <div class="kpi-value">6</div>
+    <div class="kpi-note">In the latest run comparison</div></div>
+  <div class="card"><div class="kpi-label">Distinct finding types</div>
+    <div class="kpi-value">4</div>
+    <div class="kpi-note">Latest execution</div></div>
+  <div class="card"><div class="kpi-label">Evidence issues</div>
+    <div class="kpi-value">3</div>
+    <div class="kpi-note">Missing, pending or expired evidence; N/A means unavailable</div></div>
+  <div class="card"><div class="kpi-label">Overdue tasks</div>
+    <div class="kpi-value">3</div>
+    <div class="kpi-note">Open tasks past their due date; N/A means unavailable</div></div>
+  <div class="card"><div class="kpi-label">Maximum days overdue</div>
+    <div class="kpi-value">3</div>
+    <div class="kpi-note">Based on available operational metrics</div></div>
+  <div class="card"><div class="kpi-label">Validated remediations</div>
+    <div class="kpi-value">0</div>
+    <div class="kpi-note">PASS + valid timezone-aware timestamp + evidence reference</div></div>
+  <div class="card"><div class="kpi-label">Pending validation</div>
+    <div class="kpi-value">0</div>
+    <div class="kpi-note">Corrective action recorded but not formally validated</div></div>
+</section>
+
+<section class="two-col">
+  <div class="panel">
+    <h2>Severity distribution — latest execution</h2>
+    <div class="bar-row"><span class="bar-label">Critical</span><div class="bar-track"><div class="bar-fill" style="width:0.0%"></div></div><strong>0</strong></div>
+<div class="bar-row"><span class="bar-label">High</span><div class="bar-track"><div class="bar-fill" style="width:100.0%"></div></div><strong>6</strong></div>
+<div class="bar-row"><span class="bar-label">Medium</span><div class="bar-track"><div class="bar-fill" style="width:0.0%"></div></div><strong>0</strong></div>
+<div class="bar-row"><span class="bar-label">Low</span><div class="bar-track"><div class="bar-fill" style="width:0.0%"></div></div><strong>0</strong></div>
+  </div>
+  <div class="panel">
+    <h2>Latest comparison status</h2>
+    <p><strong>Recurring:</strong> 6</p>
+    <p><strong>New:</strong> 0</p>
+    <p><strong>Not present in latest:</strong> 0</p>
+    <p class="kpi-note">Comparison statuses are based on the analytics CSV.</p>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Historical execution summary</h2>
+  <div class="table-wrap"><table><thead><tr><th>Run ID</th><th>Executed at</th><th>Controls</th><th>Findings</th><th>Critical</th><th>High</th><th>Medium</th><th>Low</th></tr></thead><tbody><tr><td>6</td><td>2026-10-23T15:00:57+00:00</td><td>5</td><td>6</td><td>0</td><td>6</td><td>0</td><td>0</td></tr><tr><td>5</td><td>2026-10-23T14:42:58+00:00</td><td>5</td><td>6</td><td>0</td><td>6</td><td>0</td><td>0</td></tr><tr><td>4</td><td>2026-10-23T14:15:29+00:00</td><td>5</td><td>6</td><td>0</td><td>6</td><td>0</td><td>0</td></tr><tr><td>3</td><td>2026-10-23T14:12:23+00:00</td><td>5</td><td>6</td><td>0</td><td>6</td><td>0</td><td>0</td></tr><tr><td>2</td><td>2026-10-23T13:35:06+00:00</td><td>5</td><td>6</td><td>0</td><td>6</td><td>0</td><td>0</td></tr><tr><td>1</td><td>2026-10-23T13:31:47+00:00</td><td>5</td><td>6</td><td>0</td><td>6</td><td>0</td><td>0</td></tr></tbody></table></div>
+</section>
+
+<section class="panel">
+  <h2>Evidence and SLA exposure</h2>
+  <p class="kpi-note">Operational metrics are available. Days overdue use the reference date applied by the analytics process.</p>
+  <div class="table-wrap"><table><thead><tr><th>Item type</th><th>Item ID</th><th>Control</th><th>Issue</th><th>Status</th><th>Due / expiry date</th><th>Days overdue</th><th>Owner</th><th>Remediation</th></tr></thead><tbody><tr><td>EVIDENCE</td><td>EV002</td><td>CTRL002</td><td>EVIDENCE_EXPIRED</td><td>Submitted</td><td>2026-10-01</td><td>22</td><td></td><td>NOT_TRACKED</td></tr><tr><td>TASK</td><td>TASK003</td><td>CTRL003</td><td>SLA_OVERDUE</td><td>Pending</td><td>2026-10-20</td><td>3</td><td>HR</td><td>NOT_TRACKED</td></tr><tr><td>TASK</td><td>TASK005</td><td>CTRL005</td><td>SLA_OVERDUE</td><td>Pending</td><td>2026-10-21</td><td>2</td><td>AI Governance</td><td>NOT_TRACKED</td></tr><tr><td>TASK</td><td>TASK002</td><td>CTRL002</td><td>SLA_OVERDUE</td><td>In Progress</td><td>2026-10-22</td><td>1</td><td>Security Operations</td><td>NOT_TRACKED</td></tr><tr><td>EVIDENCE</td><td>EV003</td><td>CTRL003</td><td>EVIDENCE_NOT_SUBMITTED</td><td>Pending</td><td></td><td>0</td><td></td><td>NOT_TRACKED</td></tr><tr><td>EVIDENCE</td><td>NO_RECORD</td><td>CTRL005</td><td>MISSING_EVIDENCE</td><td>NO_RECORD</td><td></td><td>0</td><td></td><td>NOT_TRACKED</td></tr></tbody></table></div>
+</section>
+
+<section class="panel">
+  <h2>Recurring findings by control</h2>
+  <div class="table-wrap"><table><thead><tr><th>Control</th><th>Finding type</th><th>Occurrences</th><th>Latest run</th><th>Severity</th></tr></thead><tbody><tr><td>CTRL002</td><td>EVIDENCE_EXPIRED</td><td>6</td><td>6</td><td>HIGH</td></tr><tr><td>CTRL002</td><td>SLA_OVERDUE</td><td>6</td><td>6</td><td>HIGH</td></tr><tr><td>CTRL003</td><td>EVIDENCE_NOT_SUBMITTED</td><td>6</td><td>6</td><td>HIGH</td></tr><tr><td>CTRL003</td><td>SLA_OVERDUE</td><td>6</td><td>6</td><td>HIGH</td></tr><tr><td>CTRL005</td><td>MISSING_EVIDENCE</td><td>6</td><td>6</td><td>HIGH</td></tr><tr><td>CTRL005</td><td>SLA_OVERDUE</td><td>6</td><td>6</td><td>HIGH</td></tr></tbody></table></div>
+</section>
+
+<section class="panel">
+  <h2>Formal remediation register</h2>
+  <div class="table-wrap"><table><thead><tr><th>Control</th><th>Finding type</th><th>Owner</th><th>Corrective action</th><th>Evidence reference</th><th>Validated at</th><th>Verification result</th><th>Status</th></tr></thead><tbody><tr><td colspan="8">No remediation records have been entered. Items remain NOT_TRACKED until a record is created.</td></tr></tbody></table></div>
+  <p class="kpi-note">VALIDATED requires verification result PASS, a non-empty evidence reference and an ISO 8601 timestamp with timezone. The displayed status is derived from these fields, not from the CSV status column.</p>
+</section>
+
+<section class="panel">
+  <h2>Latest run comparison details</h2>
+  <div class="table-wrap"><table><thead><tr><th>Comparison</th><th>Status</th><th>Control</th><th>Finding type</th><th>Severity</th><th>Details</th></tr></thead><tbody><tr><td>5-&gt;6</td><td>RECURRING</td><td>CTRL002</td><td>EVIDENCE_EXPIRED</td><td>HIGH</td><td>Evidence EV002 expired on 2026-10-01.</td></tr><tr><td>5-&gt;6</td><td>RECURRING</td><td>CTRL002</td><td>SLA_OVERDUE</td><td>HIGH</td><td>Task TASK002 is In Progress and was due on 2026-10-22.</td></tr><tr><td>5-&gt;6</td><td>RECURRING</td><td>CTRL003</td><td>EVIDENCE_NOT_SUBMITTED</td><td>HIGH</td><td>Evidence EV003 status is Pending.</td></tr><tr><td>5-&gt;6</td><td>RECURRING</td><td>CTRL003</td><td>SLA_OVERDUE</td><td>HIGH</td><td>Task TASK003 is Pending and was due on 2026-10-20.</td></tr><tr><td>5-&gt;6</td><td>RECURRING</td><td>CTRL005</td><td>MISSING_EVIDENCE</td><td>HIGH</td><td>No evidence record exists for this control.</td></tr><tr><td>5-&gt;6</td><td>RECURRING</td><td>CTRL005</td><td>SLA_OVERDUE</td><td>HIGH</td><td>Task TASK005 is Pending and was due on 2026-10-21.</td></tr></tbody></table></div>
+</section>
+
+<section class="note">
+  <strong>Governance interpretation:</strong>
+  A finding marked NOT_PRESENT_IN_LATEST is not proof of remediation.
+  Closure requires evidence of corrective action and validation against
+  the relevant control. Remediation status is NOT_TRACKED until a remediation
+  record is entered. A record is considered VALIDATED only when the result is
+  PASS, a timezone-aware validation timestamp is present, and an evidence
+  reference is recorded. Operational metrics marked N/A were not available;
+  this does not mean that no exposure exists. This dashboard summarizes
+  recorded data and does not independently validate remediation or verify
+  evidence, and it does not calculate residual risk. The SQLite history
+  records events but is not immutable against direct database modification.
+</section>
+
+<footer>
+  Generated locally: 2026-10-24T10:46:17-03:00 ·
+  Source: GRC analytics CSV files · Synthetic portfolio data
+</footer>
+</main>
+</body>
+</html>

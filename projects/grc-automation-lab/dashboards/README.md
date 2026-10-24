@@ -24,7 +24,7 @@ See the [Vulnerability Management README](vulnerability-management/README.md) fo
 
 ### 2. Executive GRC Dashboard
 
-**Path:** `../runtime/analytics/grc_executive_dashboard.html`
+**Path:** [Open the Executive GRC Dashboard](grc-executive/grc_executive_dashboard.html)
 
 A generated dashboard that summarizes GRC analytics, including:
 - Controls evaluated and reported findings.
