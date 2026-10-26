@@ -1,111 +1,314 @@
-# Cyber GRC Engineering Portfolio
+# ◈ CYBER GRC ENGINEERING PORTFOLIO
 
-**Cyber GRC | SAP Security | SAP GRC | Vulnerability Management | AI Governance**
+<p align="center">
+  <strong>GOVERNANCE · RISK · SECURITY ENGINEERING · RESPONSIBLE AI</strong>
+</p>
 
-An independent portfolio of cybersecurity governance projects, risk assessment methods, reference architectures, and automation prototypes. The portfolio demonstrates how governance, risk, compliance, and engineering practices can support measurable, auditable, and business-aligned security outcomes.
+<p align="center">
+  <a href="https://github.com/adriana-cybergrc/cyber-grc-engineering-portfolio">
+    <img src="https://img.shields.io/badge/Portfolio-Cyber%20GRC-00D9FF?style=for-the-badge&logo=github&logoColor=white" alt="Cyber GRC Portfolio">
+  </a>
+  <img src="https://img.shields.io/badge/Focus-Risk%20%26%20Governance-8B5CF6?style=for-the-badge" alt="Risk and Governance">
+  <img src="https://img.shields.io/badge/Approach-Evidence--Driven-14B8A6?style=for-the-badge" alt="Evidence Driven">
+  <img src="https://img.shields.io/badge/AI-Human%20Oversight-EC4899?style=for-the-badge" alt="Responsible AI">
+</p>
 
-## Featured Projects
+<p align="center">
+  <strong>Transforming cybersecurity governance into measurable, traceable and business-aligned outcomes.</strong>
+</p>
 
-| Project | Focus | Status |
+<p align="center">
+  An independent engineering portfolio exploring how governance, risk management, security controls, automation and responsible AI can work together to improve cybersecurity decision-making.
+</p>
+
+<p align="center">
+  <a href="#-featured-projects">Projects</a> ·
+  <a href="#-live-demonstrations">Live Demos</a> ·
+  <a href="#-engineering-principles">Principles</a> ·
+  <a href="#-technology--frameworks">Technology</a> ·
+  <a href="#-roadmap">Roadmap</a>
+</p>
+
+---
+
+## ◈ The Mission
+
+Cybersecurity governance should do more than document requirements. It should help organizations understand exposure, prioritize decisions, demonstrate control effectiveness and establish accountability.
+
+This portfolio explores the engineering practices that connect cybersecurity strategy to measurable execution.
+
+**The objective is to build practical, transparent and auditable examples of Cyber GRC Engineering** — combining risk-based governance, security metrics, evidence management, workflow automation and human oversight.
+
+### The engineering perspective
+
+| Dimension | Engineering objective |
+|---|---|
+| Governance | Translate policies and requirements into operational controls. |
+| Risk | Prioritize exposure according to business impact and context. |
+| Assurance | Connect control objectives, evidence, findings and validation. |
+| Automation | Reduce manual effort while preserving accountability. |
+| Measurement | Convert technical information into decision-useful indicators. |
+| Responsible AI | Apply transparency, human oversight and appropriate safeguards. |
+
+---
+
+## ◈ Featured Projects
+
+The portfolio includes working prototypes, developing engineering artifacts and planned research. Each project is identified according to its current maturity.
+
+| Project | Engineering focus | Status |
 |---|---|---|
-| [GRC Executive Dashboard](projects/grc-automation-lab/dashboards/grc-executive/grc_executive_dashboard.html) · [Live Demo](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/grc-executive/grc_executive_dashboard.html) | Cyber risk governance, findings, evidence, SLAs, remediation validation | Published prototype |
-| [Vulnerability Management Executive Dashboard](projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html) · [Live Demo](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html) | Vulnerability exposure, remediation SLAs, overdue findings, CSV analysis | Published prototype |
-| [Cyber GRC Risk Register](projects/cyber-grc-risk-register/README.md) | Risk scenarios, scoring, and CSV validation | Starter |
-| [GRC Automation Lab](projects/grc-automation-lab/README.md) | Workflow automation, analytics, and auditability | In progress |
-| [SAP Security Lab](projects/sap-security-lab/README.md) | Access governance and authorization concepts | Planned |
-| [SAP GRC SoD Lab](projects/sap-grc-sod-lab/README.md) | Segregation of Duties and mitigation concepts | Planned |
+| [GRC Executive Dashboard](projects/grc-automation-lab/dashboards/grc-executive/grc_executive_dashboard.html) | Executive GRC visibility and management indicators | Published prototype |
+| [Vulnerability Management Dashboard](projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html) | Vulnerability exposure, remediation SLAs and CSV analysis | Published prototype |
+| [Cyber GRC Risk Register](projects/cyber-grc-risk-register/README.md) | Risk scenarios, scoring and CSV validation | Initial project |
+| [GRC Automation Lab](projects/grc-automation-lab/README.md) | Workflow concepts, reporting and auditability | In progress |
+| [SAP Security Lab](projects/sap-security-lab/README.md) | SAP access governance and authorization concepts | Planned |
+| [SAP GRC Segregation of Duties Lab](projects/sap-grc-sod-lab/README.md) | Segregation of duties and mitigation concepts | Planned |
 | [AI Cyber Risk Governance](projects/ai-cyber-risk-governance/README.md) | AI risk controls and human oversight | Planned |
-| [Cybersecurity Research](projects/cybersecurity-research/README.md) | Research notes and case studies | Planned |
+| [Cybersecurity Research](projects/cybersecurity-research/README.md) | Research notes, technical analysis and case studies | Planned |
 
+> **Maturity principle:** a published prototype is not equivalent to a production implementation. Project status reflects the current scope, not a claim of operational readiness.
 
-## Featured Demonstration: Vulnerability Management
+---
 
-The executive dashboard prototype illustrates how vulnerability data can be transformed into actionable management information.
+## ◈ Live Demonstrations
 
-**Key capabilities**
-- Executive indicators for open vulnerabilities, critical findings, overdue remediation, SLA compliance, and remediated items.
-- Filtering by country, severity, status, responsible party, SLA status, and search criteria.
-- CSV import and export for sample vulnerability records.
-- Visual summaries and a detailed vulnerability table.
-- Print-friendly reporting for review and discussion.
+### 01 — GRC Executive Dashboard
 
-**Current scope and limitations**
-- Processes imported CSV data in the browser.
-- Does not connect directly to Tenable or other vulnerability management platforms.
-- Does not establish a production integration, automated scanning process, or authoritative remediation workflow.
-- Uses synthetic data for demonstration.
-- SLA definitions and reporting logic must be validated against the applicable organizational policy before operational use.
+**Purpose:** Explore an executive reporting prototype focused on cybersecurity governance and management visibility.
 
-[**Open the Live Dashboard →**](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html)
+- [Launch live dashboard](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/grc-executive/grc_executive_dashboard.html)
+- [View source code](projects/grc-automation-lab/dashboards/grc-executive/grc_executive_dashboard.html)
 
-## Portfolio Principles
+The dashboard's actual indicators and behaviors should be evaluated directly in the implementation. Its presence in this portfolio does not imply that every GRC workflow or control assurance capability described elsewhere has been implemented.
 
-- **Risk-informed security:** prioritize cybersecurity decisions according to business impact and exposure.
-- **Traceability:** connect risks, controls, evidence, remediation actions, and decisions.
-- **Human accountability:** retain explicit human ownership for risk acceptance and high-impact decisions.
-- **Measurable outcomes:** use meaningful indicators to support prioritization, oversight, and continuous improvement.
-- **Responsible AI:** apply human oversight, transparency, and appropriate controls to AI-supported activities.
-- **Reproducibility:** use synthetic data and documented assumptions in demonstration environments.
-- **Confidentiality:** exclude confidential company, customer, supplier, and production information.
+### 02 — Vulnerability Management Executive Dashboard
 
-## Technology and Frameworks
+**Purpose:** Demonstrate how imported vulnerability records can be transformed into management indicators and filtered operational views.
 
-The portfolio may include examples involving:
+<p align="center">
+  <a href="https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html">
+    <img src="https://img.shields.io/badge/LAUNCH-Live%20Dashboard-00D9FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Launch Vulnerability Dashboard">
+  </a>
+  <a href="projects/grc-automation-lab/dashboards/vulnerability-management/README.md">
+    <img src="https://img.shields.io/badge/READ-Technical%20Documentation-8B5CF6?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Read Technical Documentation">
+  </a>
+</p>
 
-- Python and automated validation.
-- HTML, JavaScript, and browser-based reporting.
-- Git and GitHub Pages.
-- SAP Security and SAP GRC concepts.
-- Cybersecurity governance, risk assessment, and control mapping.
-- NIST Cybersecurity Framework, ISO/IEC 27001, and related standards.
-- AI risk governance and human oversight.
+**Current capabilities**
 
-Frameworks are referenced for educational and analytical purposes. Each project should identify the specific framework version and control mappings relevant to its scope.
+- Executive indicators for open vulnerabilities, critical findings, overdue SLAs, SLA compliance and remediated findings.
+- Filtering by country, severity, status, responsible party and SLA status.
+- CSV import and export for vulnerability records.
+- Searchable records and detailed operational views.
+- Visual summaries and print-friendly reporting.
 
-## Getting Started
+**Current boundaries**
 
-Clone the repository:
+- Records are imported from CSV and processed in the browser.
+- No direct Tenable API integration or automated scan ingestion is implemented.
+- The dashboard does not replace the authoritative vulnerability management platform.
+- A persistent remediation register, controlled state transitions and a tamper-resistant audit trail are not yet implemented.
+- SLA rules and reporting calculations require validation against the applicable organizational policy before operational use.
+
+**Demonstration:** [Open Vulnerability Management Dashboard](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html)
+
+---
+
+## ◈ Engineering Principles
+
+### Risk before activity
+
+Prioritize work according to exposure, business impact, exploitability and applicable obligations — not merely the number of findings closed.
+
+### Traceability by design
+
+Build toward an explicit relationship between:
+
+`Risk → Control → Evidence → Finding → Corrective Action → Validation → Decision`
+
+Traceability is a design objective; each project must document which links are actually implemented.
+
+### Human accountability
+
+Automation can organize evidence, calculate indicators and support recommendations. Accountable people remain responsible for risk acceptance, exceptions and consequential security decisions.
+
+### Evidence over assumptions
+
+Document data sources, calculation rules, test scenarios, limitations and validation results. Do not treat an indicator as reliable without understanding how it was produced.
+
+### Measurable outcomes
+
+Distinguish exposure, remediation progress, SLA performance, exceptions and verified closure. Metrics should support decisions rather than reward activity without context.
+
+### Responsible AI
+
+Apply appropriate human oversight, transparency, access restrictions and risk assessment to AI-assisted processes. AI output is not automatically authoritative evidence.
+
+### Reproducibility and confidentiality
+
+Use synthetic demonstration data, document assumptions and exclude confidential company, customer, supplier and production information from public artifacts.
+
+---
+
+## ◈ Technology & Frameworks
+
+### Engineering technologies
+
+| Technology | Intended application |
+|---|---|
+| HTML, CSS and JavaScript | Browser-based reporting prototypes |
+| Python | Data validation, analysis and automation examples |
+| CSV | Portable input and output for selected prototypes |
+| Git and GitHub | Version control, documentation and collaboration |
+| GitHub Pages | Public demonstration of static projects |
+| Automated testing | Repeatable verification where implemented |
+
+The technologies listed describe the portfolio's scope and potential use. They do not imply that every technology is used in every project.
+
+### Governance and security references
+
+| Reference | Area of application |
+|---|---|
+| NIST Cybersecurity Framework 2.0 | Cybersecurity governance and risk outcomes |
+| NIST SP 800-30 | Risk assessment methodology |
+| NIST SP 800-53 | Security and privacy control references |
+| ISO/IEC 27001 | Information security management systems |
+| ISO/IEC 27002 | Information security controls |
+| ISO/IEC 27005 | Information security risk management |
+| ISO/IEC 27701 | Privacy information management |
+| ISO/IEC 42001 | AI management systems |
+| NIST AI RMF | AI risk management |
+| COBIT 2019 | Governance and management of enterprise IT |
+| SAP security and SAP GRC concepts | Access governance and segregation of duties |
+
+Framework mappings must identify the relevant version, scope and source. A conceptual mapping is not proof of compliance, certification or control effectiveness.
+
+---
+
+## ◈ Roadmap
+
+The roadmap prioritizes verifiable engineering progress over feature count.
+
+- [x] Publish the vulnerability management dashboard prototype.
+- [x] Document its CSV-based operating model and current limitations.
+- [ ] Expand reproducible test coverage and publish test results.
+- [ ] Strengthen CSV validation, normalization and duplicate detection.
+- [ ] Implement a structured remediation register.
+- [ ] Record accountable owner, corrective action, due date and evidence reference.
+- [ ] Add validation date, verifier and verification result.
+- [ ] Preserve remediation status history and timestamps.
+- [ ] Implement and test browser-based persistence and data recovery for the initial prototype.
+- [ ] Evaluate a backend and database for centralized, multi-user operation.
+- [ ] Develop a synthetic SAP segregation-of-duties ruleset.
+- [ ] Build an AI cyber risk assessment example with explicit human review.
+- [ ] Expand control-to-evidence traceability and audit-ready documentation.
+
+Roadmap items are planned improvements, not claims of completed functionality. Completion should be recorded only after implementation and relevant tests.
+
+---
+
+## ◈ Repository Structure
+
+```text
+.
+├── data/               # Synthetic example data
+├── docs/               # Architecture and contribution guidance
+├── projects/
+│   ├── grc-automation-lab/
+│   │   └── dashboards/
+│   │       ├── grc-executive/
+│   │       └── vulnerability-management/
+│   ├── cyber-grc-risk-register/
+│   ├── sap-security-lab/
+│   ├── sap-grc-sod-lab/
+│   ├── ai-cyber-risk-governance/
+│   └── cybersecurity-research/
+├── src/                # Shared Python code, where applicable
+├── tests/              # Automated tests, where implemented
+├── .gitignore
+├── README.md
+└── requirements.txt
+```
+
+This is a logical overview of the intended repository organization. Individual directories and files may be added as projects evolve.
+
+---
+
+## ◈ Getting Started
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/adriana-cybergrc/cyber-grc-engineering-portfolio.git
 cd cyber-grc-engineering-portfolio
 ```
 
-For the vulnerability management dashboard, open the HTML file in a modern browser or use the [published GitHub Pages demonstration](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html).
+### 2. Explore the dashboards
 
-To run Python-based projects, consult the README and requirements of the specific project before executing commands. Python 3.11 or later is recommended for applicable Python labs.
+Open the HTML files in a modern browser or use the published demonstrations:
 
-## Repository Structure
+- [GRC Executive Dashboard](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/grc-executive/grc_executive_dashboard.html)
+- [Vulnerability Management Dashboard](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html)
 
-```text
-.
-├── data/             # Synthetic example data
-├── docs/             # Architecture and contribution guidance
-├── projects/         # Independent portfolio projects
-├── src/              # Shared Python code, where applicable
-├── tests/            # Automated tests, where implemented
-├── .gitignore
-├── README.md
-└── requirements.txt
-```
+Use synthetic data for public demonstrations.
 
-Individual projects may have their own requirements, instructions, test coverage, and maturity level.
+### 3. Explore Python projects
 
-## Roadmap
+Read the README and requirements for the specific project before installing dependencies or running commands. Python 3.11 or later is a suggested baseline for applicable Python projects; individual projects may require a different version.
 
-- [x] Publish the initial risk register example.
-- [x] Publish the vulnerability management executive dashboard prototype.
-- [x] Validate the dashboard with synthetic CSV test scenarios.
-- [ ] Expand automated test coverage and document test results.
-- [ ] Implement persistent remediation traceability, including owner, corrective action, evidence, validation date, and verification outcome.
-- [ ] Add a synthetic SAP Segregation of Duties rule matrix.
-- [ ] Develop an AI risk assessment example with explicit human review gates.
-- [ ] Expand control-to-evidence traceability and audit-ready documentation.
+### 4. Review project-specific maturity
 
-## Disclaimer
+Before relying on an artifact, check its documentation for prerequisites, supported inputs, known limitations, test coverage and validation status.
+
+---
+
+## ◈ Quality & Validation
+
+Engineering quality requires more than a successful demonstration.
+
+Where applicable, projects should progressively document:
+
+- **Functional correctness:** calculations and state changes match documented rules.
+- **Input validation:** malformed, missing, duplicate or unexpected values are handled safely.
+- **Test reproducibility:** scenarios can be repeated with known inputs and expected outcomes.
+- **Data integrity:** exports and persisted records retain the intended information.
+- **Auditability:** important changes can be attributed and reconstructed.
+- **Security:** access, data handling and deployment assumptions are explicit.
+- **Limitations:** unsupported integrations and unverified claims are clearly identified.
+
+Test status must reflect tests actually executed. A manually exercised prototype must not be described as comprehensively tested or production-ready.
+
+---
+
+## ◈ Security & Responsible Use
 
 This repository is an independent educational portfolio. It is not affiliated with or endorsed by NIST, ISO, SAP, or any employer.
 
-Projects are prototypes and learning artifacts, not representations of production implementations or certifications. Framework references and control mappings must be verified against current official publications. Validate security logic, assumptions, test coverage, and organizational requirements before using any artifact in a real environment.
+- Use synthetic or appropriately anonymized data in public demonstrations.
+- Do not publish credentials, secrets, internal architecture details or confidential vulnerability information.
+- Validate calculation logic, control mappings, security requirements and governance assumptions before adapting any artifact to a real environment.
+- Do not treat prototype outputs as authoritative risk decisions or proof of compliance.
+- Do not use these examples as the sole basis for production security decisions.
 
-All demonstration data should be synthetic or appropriately sanitized. No production security decisions should rely solely on these examples.
+All framework references and control mappings must be verified against the applicable official publications.
+
+---
+
+## ◈ The Standard
+
+<p align="center">
+  <strong>Governance that guides decisions.</strong><br>
+  <strong>Engineering that makes controls actionable.</strong><br>
+  <strong>Evidence that makes outcomes verifiable.</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/adriana-cybergrc/cyber-grc-engineering-portfolio">Explore the Repository</a>
+  &nbsp; · &nbsp;
+  <a href="https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/">Visit the Portfolio Site</a>
+</p>
+
+<p align="center">
+  <sub>Cyber GRC Engineering Portfolio · Learn · Build · Validate · Improve</sub>
+</p>
