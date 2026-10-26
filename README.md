@@ -8,13 +8,15 @@ An independent portfolio of cybersecurity governance projects, risk assessment m
 
 | Project | Focus | Status |
 |---|---|---|
-| [Vulnerability Management Executive Dashboard](projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html) · [Live Demo](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html) | Executive KPIs, remediation SLAs, risk visibility, CSV analysis | **Published prototype** |
+| [GRC Executive Dashboard](projects/grc-automation-lab/dashboards/grc-executive/grc_executive_dashboard.html) · [Live Demo](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/grc-executive/grc_executive_dashboard.html) | Cyber risk governance, findings, evidence, SLAs, remediation validation | Published prototype |
+| [Vulnerability Management Executive Dashboard](projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html) · [Live Demo](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html) | Vulnerability exposure, remediation SLAs, overdue findings, CSV analysis | Published prototype |
 | [Cyber GRC Risk Register](projects/cyber-grc-risk-register/README.md) | Risk scenarios, scoring, and CSV validation | Starter |
-| [GRC Automation Lab](projects/grc-automation-lab/README.md) | Workflow automation, monitoring, and reporting | In progress |
+| [GRC Automation Lab](projects/grc-automation-lab/README.md) | Workflow automation, analytics, and auditability | In progress |
 | [SAP Security Lab](projects/sap-security-lab/README.md) | Access governance and authorization concepts | Planned |
 | [SAP GRC SoD Lab](projects/sap-grc-sod-lab/README.md) | Segregation of Duties and mitigation concepts | Planned |
-| [AI Cyber Risk Governance](projects/ai-cyber-risk-governance/README.md) | AI risk controls, oversight, and accountability | Planned |
-| [Cybersecurity Research](projects/cybersecurity-research/README.md) | Research notes and cybersecurity case studies | Planned |
+| [AI Cyber Risk Governance](projects/ai-cyber-risk-governance/README.md) | AI risk controls and human oversight | Planned |
+| [Cybersecurity Research](projects/cybersecurity-research/README.md) | Research notes and case studies | Planned |
+
 
 ## Featured Demonstration: Vulnerability Management
 
