@@ -250,6 +250,79 @@ class TestRemediationStore(unittest.TestCase):
         self.assertEqual(after_record, before_record)
         self.assertEqual(after_history, before_history)
 
+    def test_metadata_is_saved_to_current_record_and_history(self):
+        self.save(
+            recorded_by="analyst@example.com",
+            validated_by="reviewer@example.com",
+            change_reason="Retest evidence reviewed",
+        )
+
+        rows = store.load_remediations(self.database)
+        self.assertEqual(rows[0]["recorded_by"], "analyst@example.com")
+        self.assertEqual(rows[0]["validated_by"], "reviewer@example.com")
+        self.assertEqual(rows[0]["change_reason"], "Retest evidence reviewed")
+
+        with closing(sqlite3.connect(self.database)) as connection:
+            event = connection.execute(
+                "SELECT recorded_by, validated_by, change_reason, event_type "
+                "FROM remediation_history"
+            ).fetchone()
+        self.assertEqual(
+            event,
+            ("analyst@example.com", "reviewer@example.com", "Retest evidence reviewed", "VALIDATION"),
+        )
+
+    def test_migrates_legacy_database_without_losing_rows(self):
+        with closing(sqlite3.connect(self.database)) as connection, connection:
+            connection.execute("""
+                CREATE TABLE remediation_records (
+                    control_id TEXT NOT NULL,
+                    finding_type TEXT NOT NULL,
+                    owner TEXT NOT NULL,
+                    corrective_action TEXT NOT NULL,
+                    evidence_reference TEXT NOT NULL DEFAULT '',
+                    validated_at TEXT NOT NULL DEFAULT '',
+                    verification_result TEXT NOT NULL DEFAULT 'PENDING',
+                    updated_at TEXT NOT NULL,
+                    PRIMARY KEY (control_id, finding_type)
+                )
+            """)
+            connection.execute("""
+                CREATE TABLE remediation_history (
+                    history_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    control_id TEXT NOT NULL,
+                    finding_type TEXT NOT NULL,
+                    owner TEXT NOT NULL,
+                    corrective_action TEXT NOT NULL,
+                    evidence_reference TEXT NOT NULL,
+                    validated_at TEXT NOT NULL,
+                    verification_result TEXT NOT NULL,
+                    recorded_at TEXT NOT NULL
+                )
+            """)
+            connection.execute(
+                "INSERT INTO remediation_records VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                ("CTRL001", "MISSING_EVIDENCE", "Team", "Collect evidence", "", "", "PENDING", "2026-10-01T00:00:00+00:00"),
+            )
+            connection.execute(
+                "INSERT INTO remediation_history "
+                "(control_id, finding_type, owner, corrective_action, evidence_reference, validated_at, verification_result, recorded_at) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                ("CTRL001", "MISSING_EVIDENCE", "Team", "Collect evidence", "", "", "PENDING", "2026-10-01T00:00:00+00:00"),
+            )
+
+        store.initialize_remediation_store(self.database)
+        rows = store.load_remediations(self.database)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["control_id"], "CTRL001")
+        self.assertEqual(rows[0]["recorded_by"], "")
+        with closing(sqlite3.connect(self.database)) as connection:
+            self.assertEqual(connection.execute("SELECT COUNT(*) FROM remediation_history").fetchone()[0], 1)
+            record_columns = {row[1] for row in connection.execute("PRAGMA table_info(remediation_records)")}
+            history_columns = {row[1] for row in connection.execute("PRAGMA table_info(remediation_history)")}
+        self.assertTrue({"recorded_by", "validated_by", "change_reason"}.issubset(record_columns))
+        self.assertTrue({"recorded_by", "validated_by", "change_reason", "event_type"}.issubset(history_columns))
+
     def test_missing_database_returns_empty_list(self):
         missing_database = (
             Path(self.temp_dir.name) / "missing.db"

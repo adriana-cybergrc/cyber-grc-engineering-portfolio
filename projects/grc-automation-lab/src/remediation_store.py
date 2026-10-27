@@ -60,6 +60,9 @@ def initialize_remediation_store(database_path=DEFAULT_DATABASE):
                         verification_result IN ('PENDING', 'PASS', 'FAIL')
                     ),
                 updated_at TEXT NOT NULL,
+                recorded_by TEXT NOT NULL DEFAULT '',
+                validated_by TEXT NOT NULL DEFAULT '',
+                change_reason TEXT NOT NULL DEFAULT '',
                 PRIMARY KEY (control_id, finding_type)
             )
             """
@@ -76,10 +79,42 @@ def initialize_remediation_store(database_path=DEFAULT_DATABASE):
                 evidence_reference TEXT NOT NULL,
                 validated_at TEXT NOT NULL,
                 verification_result TEXT NOT NULL,
-                recorded_at TEXT NOT NULL
+                recorded_at TEXT NOT NULL,
+                recorded_by TEXT NOT NULL DEFAULT '',
+                validated_by TEXT NOT NULL DEFAULT '',
+                change_reason TEXT NOT NULL DEFAULT '',
+                event_type TEXT NOT NULL DEFAULT 'UPSERT'
             )
             """
         )
+
+        # Non-destructive migration for databases created by earlier versions.
+        # PRAGMA table_info returns rows whose name is at index 1.
+        migrations = {
+            "remediation_records": {
+                "recorded_by": "TEXT NOT NULL DEFAULT ''",
+                "validated_by": "TEXT NOT NULL DEFAULT ''",
+                "change_reason": "TEXT NOT NULL DEFAULT ''",
+            },
+            "remediation_history": {
+                "recorded_by": "TEXT NOT NULL DEFAULT ''",
+                "validated_by": "TEXT NOT NULL DEFAULT ''",
+                "change_reason": "TEXT NOT NULL DEFAULT ''",
+                "event_type": "TEXT NOT NULL DEFAULT 'UPSERT'",
+            },
+        }
+        for table, columns in migrations.items():
+            existing = {
+                row[1]
+                for row in connection.execute(
+                    f"PRAGMA table_info({table})"
+                ).fetchall()
+            }
+            for column, definition in columns.items():
+                if column not in existing:
+                    connection.execute(
+                        f"ALTER TABLE {table} ADD COLUMN {column} {definition}"
+                    )
 
 
 def remediation_status(record):
@@ -123,8 +158,14 @@ def save_remediation(
     evidence_reference="",
     validated_at="",
     verification_result="PENDING",
+    recorded_by="",
+    validated_by="",
+    change_reason="",
 ):
-    """Save the current remediation state and append a history event."""
+    """Save current remediation state and append an attributable history event.
+
+    Actor fields remain optional for backward compatibility with existing callers.
+    """
     control_id = str(control_id or "").strip()
     finding_type = str(finding_type or "").strip()
     owner = str(owner or "").strip()
@@ -132,6 +173,9 @@ def save_remediation(
     evidence_reference = str(evidence_reference or "").strip()
     validated_at = str(validated_at or "").strip()
     result = str(verification_result or "").strip().upper()
+    recorded_by = str(recorded_by or "").strip()
+    validated_by = str(validated_by or "").strip()
+    change_reason = str(change_reason or "").strip()
 
     if not all(
         (control_id, finding_type, owner, corrective_action)
@@ -176,16 +220,22 @@ def save_remediation(
                 evidence_reference,
                 validated_at,
                 verification_result,
-                updated_at
+                updated_at,
+                recorded_by,
+                validated_by,
+                change_reason
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(control_id, finding_type) DO UPDATE SET
                 owner = excluded.owner,
                 corrective_action = excluded.corrective_action,
                 evidence_reference = excluded.evidence_reference,
                 validated_at = excluded.validated_at,
                 verification_result = excluded.verification_result,
-                updated_at = excluded.updated_at
+                updated_at = excluded.updated_at,
+                recorded_by = excluded.recorded_by,
+                validated_by = excluded.validated_by,
+                change_reason = excluded.change_reason
             """,
             (
                 control_id,
@@ -196,6 +246,9 @@ def save_remediation(
                 validated_at,
                 result,
                 now,
+                recorded_by,
+                validated_by,
+                change_reason,
             ),
         )
 
@@ -209,9 +262,13 @@ def save_remediation(
                 evidence_reference,
                 validated_at,
                 verification_result,
-                recorded_at
+                recorded_at,
+                recorded_by,
+                validated_by,
+                change_reason,
+                event_type
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 control_id,
@@ -222,6 +279,10 @@ def save_remediation(
                 validated_at,
                 result,
                 now,
+                recorded_by,
+                validated_by,
+                change_reason,
+                "VALIDATION" if result == "PASS" else "UPSERT",
             ),
         )
 
@@ -247,7 +308,10 @@ def load_remediations(database_path=DEFAULT_DATABASE):
                     evidence_reference,
                     validated_at,
                     verification_result,
-                    updated_at
+                    updated_at,
+                    recorded_by,
+                    validated_by,
+                    change_reason
                 FROM remediation_records
                 ORDER BY control_id, finding_type
                 """
@@ -285,6 +349,9 @@ def main():
         choices=sorted(VALID_RESULTS),
         default="PENDING",
     )
+    parser.add_argument("--recorded-by", default="")
+    parser.add_argument("--validated-by", default="")
+    parser.add_argument("--change-reason", default="")
 
     args = parser.parse_args()
 
@@ -297,6 +364,9 @@ def main():
         evidence_reference=args.evidence_reference,
         validated_at=args.validated_at,
         verification_result=args.verification_result,
+        recorded_by=args.recorded_by,
+        validated_by=args.validated_by,
+        change_reason=args.change_reason,
     )
 
     record = {

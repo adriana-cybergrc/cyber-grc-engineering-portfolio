@@ -417,13 +417,26 @@ def main():
         remediation_records,
     )
 
+
     write_csv(
         output_dir / "remediation_register.csv",
         remediation_records,
-        ["control_id", "finding_type", "owner", "corrective_action",
-         "evidence_reference", "validated_at", "verification_result",
-         "remediation_status", "updated_at"],
+        [
+            "control_id",
+            "finding_type",
+            "owner",
+            "corrective_action",
+            "evidence_reference",
+            "validated_at",
+            "validated_by",
+            "recorded_by",
+            "change_reason",
+            "verification_result",
+            "remediation_status",
+            "updated_at",
+        ],
     )
+
 
     write_csv(
         output_dir / "operational_metrics.csv",
