@@ -367,6 +367,59 @@ def load_remediations(database_path=DEFAULT_DATABASE):
     return results
 
 
+
+def load_remediation_history(database_path=DEFAULT_DATABASE):
+    """Load remediation audit events in reverse chronological order."""
+    path = Path(database_path)
+
+    if not path.exists():
+        return []
+
+    with closing(sqlite3.connect(path)) as connection:
+        connection.row_factory = sqlite3.Row
+
+        try:
+            rows = connection.execute(
+                """
+                SELECT
+                    history_id,
+                    recorded_at,
+                    control_id,
+                    finding_type,
+                    owner,
+                    corrective_action,
+                    evidence_reference,
+                    validated_at,
+                    verification_result
+                FROM remediation_history
+                ORDER BY recorded_at DESC, history_id DESC
+                """
+            ).fetchall()
+        except sqlite3.OperationalError:
+            return []
+
+    results = []
+
+    for row in rows:
+        record = dict(row)
+
+        # Compatibility with the dashboard export schema.
+        record["event_type"] = (
+            "VALIDATION"
+            if record.get("validated_at")
+            or record.get("verification_result") not in ("", "PENDING", None)
+            else "REMEDIATION_UPDATE"
+        )
+        record["recorded_by"] = ""
+        record["validated_by"] = ""
+        record["change_reason"] = ""
+
+        results.append(record)
+
+    return results
+
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Record a GRC remediation status"

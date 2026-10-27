@@ -135,7 +135,10 @@ def build_dashboard(analytics_dir: Path) -> Path:
     remediations = (
         read_csv(remediation_path) if remediation_path.exists() else []
     )
-
+    history_path = analytics_dir / "remediation_history.csv"
+    remediation_history = (
+        read_csv(history_path) if history_path.exists() else []
+    )
     operational_path = analytics_dir / "operational_metrics.csv"
     operational_available = operational_path.exists()
     operational = (
@@ -303,6 +306,22 @@ def build_dashboard(analytics_dir: Path) -> Path:
             "Operational metrics unavailable. N/A means unknown, not zero."
         )
 
+    remediation_history_rows = [
+        [
+            row.get("recorded_at", ""),
+            row.get("event_type", ""),
+            row.get("control_id", ""),
+            row.get("finding_type", ""),
+            row.get("recorded_by", ""),
+            row.get("validated_by", ""),
+            row.get("change_reason", ""),
+            row.get("verification_result", ""),
+            row.get("evidence_reference", ""),
+        ]
+        for row in remediation_history
+    ]
+
+
     generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
 
     html_document = f"""<!DOCTYPE html>
@@ -452,6 +471,23 @@ footer {{ color: #68778b; font-size: 12px; padding: 12px 0 28px; }}
       "No remediation records have been entered. Items remain NOT_TRACKED until a record is created."
   )}
   <p class="kpi-note">VALIDATED requires verification result PASS, a non-empty evidence reference and an ISO 8601 timestamp with timezone. The displayed status is derived from these fields, not from the CSV status column.</p>
+</section>
+
+
+<section class="panel">
+  <h2>Remediation audit history</h2>
+  {make_table(
+      ["Recorded at", "Event", "Control", "Finding type",
+       "Recorded by", "Validated by", "Change reason",
+       "Verification result", "Evidence reference"],
+      remediation_history_rows,
+      "No remediation history events recorded."
+  )}
+  <p class="kpi-note">
+    This table displays recorded remediation events in reverse
+    chronological order. It does not independently verify evidence
+    authenticity or guarantee that the history is immutable.
+  </p>
 </section>
 
 <section class="panel">

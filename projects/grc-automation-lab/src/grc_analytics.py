@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 import csv
 from contextlib import closing
 import sqlite3
@@ -7,7 +7,10 @@ from datetime import date, datetime
 from collections import Counter
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from remediation_store import load_remediations
+from remediation_store import (
+    load_remediations,
+    load_remediation_history,
+)
 
 
 def load_history(db_path):
@@ -410,6 +413,7 @@ def main():
         item for item in findings if item.get("run_id") == latest_run_id
     ]
     remediation_records = load_remediations(db_path)
+    remediation_history = load_remediation_history(db_path)
     operational_metrics = load_operational_metrics(
         data_dir,
         reference_date,
@@ -436,6 +440,45 @@ def main():
             "updated_at",
         ],
     )
+
+
+
+    write_csv(
+        output_dir / "remediation_history.csv",
+        [
+            {
+                key: record.get(key, "")
+                for key in [
+                    "history_id",
+                    "recorded_at",
+                    "event_type",
+                    "control_id",
+                    "finding_type",
+                    "owner",
+                    "recorded_by",
+                    "validated_by",
+                    "change_reason",
+                    "verification_result",
+                    "evidence_reference",
+                ]
+            }
+            for record in remediation_history
+        ],
+        [
+            "history_id",
+            "recorded_at",
+            "event_type",
+            "control_id",
+            "finding_type",
+            "owner",
+            "recorded_by",
+            "validated_by",
+            "change_reason",
+            "verification_result",
+            "evidence_reference",
+        ],
+    )
+
 
 
     write_csv(
