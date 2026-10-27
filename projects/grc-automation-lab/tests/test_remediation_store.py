@@ -1,4 +1,5 @@
 
+
 import importlib.util
 import sqlite3
 import tempfile
@@ -183,7 +184,6 @@ class TestRemediationStore(unittest.TestCase):
         )
 
     def test_failed_save_does_not_persist_record_or_history(self):
-        # Establish a previously committed remediation record.
         self.save()
 
         with closing(sqlite3.connect(self.database)) as connection:
@@ -206,7 +206,6 @@ class TestRemediationStore(unittest.TestCase):
                 "SELECT COUNT(*) FROM remediation_history"
             ).fetchone()[0]
 
-        # Simulate a failure when the history event is inserted.
         with closing(sqlite3.connect(self.database)) as connection:
             connection.execute(
                 """
@@ -226,7 +225,6 @@ class TestRemediationStore(unittest.TestCase):
                 corrective_action="Updated corrective action",
             )
 
-        # Both the current record and history must remain unchanged.
         with closing(sqlite3.connect(self.database)) as connection:
             after_record = connection.execute(
                 """
@@ -250,6 +248,80 @@ class TestRemediationStore(unittest.TestCase):
         self.assertEqual(after_record, before_record)
         self.assertEqual(after_history, before_history)
 
+    def test_first_pending_save_is_classified_as_created(self):
+        self.save(
+            verification_result="PENDING",
+            evidence_reference="",
+            validated_at="",
+        )
+
+        with closing(sqlite3.connect(self.database)) as connection:
+            event = connection.execute(
+                "SELECT event_type FROM remediation_history"
+            ).fetchone()[0]
+
+        self.assertEqual(event, "CREATED")
+
+    def test_same_result_update_is_classified_as_updated(self):
+        self.save()
+        self.save(change_reason="Updated corrective action")
+
+        with closing(sqlite3.connect(self.database)) as connection:
+            events = connection.execute(
+                """
+                SELECT event_type
+                FROM remediation_history
+                ORDER BY history_id
+                """
+            ).fetchall()
+
+        self.assertEqual(
+            [event[0] for event in events],
+            ["VALIDATION", "UPDATED"],
+        )
+
+    def test_pass_to_pending_is_classified_as_reopened(self):
+        self.save()
+        self.save(
+            verification_result="PENDING",
+            evidence_reference="",
+            validated_at="",
+        )
+
+        with closing(sqlite3.connect(self.database)) as connection:
+            event = connection.execute(
+                """
+                SELECT event_type
+                FROM remediation_history
+                ORDER BY history_id DESC
+                """
+            ).fetchone()[0]
+
+        self.assertEqual(event, "REOPENED")
+
+    def test_pending_to_fail_is_classified_as_rejected(self):
+        self.save(
+            verification_result="PENDING",
+            evidence_reference="",
+            validated_at="",
+        )
+        self.save(
+            verification_result="FAIL",
+            evidence_reference="evidence/retest.txt",
+            validated_at="",
+        )
+
+        with closing(sqlite3.connect(self.database)) as connection:
+            event = connection.execute(
+                """
+                SELECT event_type
+                FROM remediation_history
+                ORDER BY history_id DESC
+                """
+            ).fetchone()[0]
+
+        self.assertEqual(event, "REJECTED")
+
     def test_metadata_is_saved_to_current_record_and_history(self):
         self.save(
             recorded_by="analyst@example.com",
@@ -258,18 +330,40 @@ class TestRemediationStore(unittest.TestCase):
         )
 
         rows = store.load_remediations(self.database)
-        self.assertEqual(rows[0]["recorded_by"], "analyst@example.com")
-        self.assertEqual(rows[0]["validated_by"], "reviewer@example.com")
-        self.assertEqual(rows[0]["change_reason"], "Retest evidence reviewed")
+
+        self.assertEqual(
+            rows[0]["recorded_by"],
+            "analyst@example.com",
+        )
+        self.assertEqual(
+            rows[0]["validated_by"],
+            "reviewer@example.com",
+        )
+        self.assertEqual(
+            rows[0]["change_reason"],
+            "Retest evidence reviewed",
+        )
 
         with closing(sqlite3.connect(self.database)) as connection:
             event = connection.execute(
-                "SELECT recorded_by, validated_by, change_reason, event_type "
-                "FROM remediation_history"
+                """
+                SELECT
+                    recorded_by,
+                    validated_by,
+                    change_reason,
+                    event_type
+                FROM remediation_history
+                """
             ).fetchone()
+
         self.assertEqual(
             event,
-            ("analyst@example.com", "reviewer@example.com", "Retest evidence reviewed", "VALIDATION"),
+            (
+                "analyst@example.com",
+                "reviewer@example.com",
+                "Retest evidence reviewed",
+                "VALIDATION",
+            ),
         )
 
     def test_migrates_legacy_database_without_losing_rows(self):
@@ -287,6 +381,7 @@ class TestRemediationStore(unittest.TestCase):
                     PRIMARY KEY (control_id, finding_type)
                 )
             """)
+
             connection.execute("""
                 CREATE TABLE remediation_history (
                     history_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -300,33 +395,93 @@ class TestRemediationStore(unittest.TestCase):
                     recorded_at TEXT NOT NULL
                 )
             """)
+
             connection.execute(
-                "INSERT INTO remediation_records VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                ("CTRL001", "MISSING_EVIDENCE", "Team", "Collect evidence", "", "", "PENDING", "2026-10-01T00:00:00+00:00"),
+                """
+                INSERT INTO remediation_records
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    "CTRL001",
+                    "MISSING_EVIDENCE",
+                    "Team",
+                    "Collect evidence",
+                    "",
+                    "",
+                    "PENDING",
+                    "2026-10-01T00:00:00+00:00",
+                ),
             )
+
             connection.execute(
-                "INSERT INTO remediation_history "
-                "(control_id, finding_type, owner, corrective_action, evidence_reference, validated_at, verification_result, recorded_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                ("CTRL001", "MISSING_EVIDENCE", "Team", "Collect evidence", "", "", "PENDING", "2026-10-01T00:00:00+00:00"),
+                """
+                INSERT INTO remediation_history (
+                    control_id,
+                    finding_type,
+                    owner,
+                    corrective_action,
+                    evidence_reference,
+                    validated_at,
+                    verification_result,
+                    recorded_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    "CTRL001",
+                    "MISSING_EVIDENCE",
+                    "Team",
+                    "Collect evidence",
+                    "",
+                    "",
+                    "PENDING",
+                    "2026-10-01T00:00:00+00:00",
+                ),
             )
 
         store.initialize_remediation_store(self.database)
         rows = store.load_remediations(self.database)
+
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["control_id"], "CTRL001")
         self.assertEqual(rows[0]["recorded_by"], "")
+
         with closing(sqlite3.connect(self.database)) as connection:
-            self.assertEqual(connection.execute("SELECT COUNT(*) FROM remediation_history").fetchone()[0], 1)
-            record_columns = {row[1] for row in connection.execute("PRAGMA table_info(remediation_records)")}
-            history_columns = {row[1] for row in connection.execute("PRAGMA table_info(remediation_history)")}
-        self.assertTrue({"recorded_by", "validated_by", "change_reason"}.issubset(record_columns))
-        self.assertTrue({"recorded_by", "validated_by", "change_reason", "event_type"}.issubset(history_columns))
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM remediation_history"
+                ).fetchone()[0],
+                1,
+            )
+
+            record_columns = {
+                row[1]
+                for row in connection.execute(
+                    "PRAGMA table_info(remediation_records)"
+                )
+            }
+            history_columns = {
+                row[1]
+                for row in connection.execute(
+                    "PRAGMA table_info(remediation_history)"
+                )
+            }
+
+        self.assertTrue(
+            {"recorded_by", "validated_by", "change_reason"}
+            .issubset(record_columns)
+        )
+        self.assertTrue(
+            {
+                "recorded_by",
+                "validated_by",
+                "change_reason",
+                "event_type",
+            }.issubset(history_columns)
+        )
 
     def test_missing_database_returns_empty_list(self):
-        missing_database = (
-            Path(self.temp_dir.name) / "missing.db"
-        )
+        missing_database = Path(self.temp_dir.name) / "missing.db"
 
         self.assertEqual(
             store.load_remediations(missing_database),

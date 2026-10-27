@@ -1,4 +1,3 @@
-
 """Persistent, auditable remediation register backed by SQLite.
 
 A remediation is considered VALIDATED only when:
@@ -16,9 +15,11 @@ from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 
+
 DEFAULT_DATABASE = Path(
     "projects/grc-automation-lab/runtime/grc_audit.db"
 )
+
 VALID_RESULTS = {"PENDING", "PASS", "FAIL"}
 
 
@@ -40,8 +41,25 @@ def _is_timezone_aware_iso(value):
     )
 
 
+def _ensure_columns(connection, table_name, columns):
+    """Add missing columns without deleting existing records."""
+    existing_columns = {
+        row[1]
+        for row in connection.execute(
+            f"PRAGMA table_info({table_name})"
+        ).fetchall()
+    }
+
+    for column_name, definition in columns.items():
+        if column_name not in existing_columns:
+            connection.execute(
+                f"ALTER TABLE {table_name} "
+                f"ADD COLUMN {column_name} {definition}"
+            )
+
+
 def initialize_remediation_store(database_path=DEFAULT_DATABASE):
-    """Create the remediation register and its history table if needed."""
+    """Create the remediation tables and migrate older schemas safely."""
     path = Path(database_path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -60,9 +78,6 @@ def initialize_remediation_store(database_path=DEFAULT_DATABASE):
                         verification_result IN ('PENDING', 'PASS', 'FAIL')
                     ),
                 updated_at TEXT NOT NULL,
-                recorded_by TEXT NOT NULL DEFAULT '',
-                validated_by TEXT NOT NULL DEFAULT '',
-                change_reason TEXT NOT NULL DEFAULT '',
                 PRIMARY KEY (control_id, finding_type)
             )
             """
@@ -79,42 +94,31 @@ def initialize_remediation_store(database_path=DEFAULT_DATABASE):
                 evidence_reference TEXT NOT NULL,
                 validated_at TEXT NOT NULL,
                 verification_result TEXT NOT NULL,
-                recorded_at TEXT NOT NULL,
-                recorded_by TEXT NOT NULL DEFAULT '',
-                validated_by TEXT NOT NULL DEFAULT '',
-                change_reason TEXT NOT NULL DEFAULT '',
-                event_type TEXT NOT NULL DEFAULT 'UPSERT'
+                recorded_at TEXT NOT NULL
             )
             """
         )
 
-        # Non-destructive migration for databases created by earlier versions.
-        # PRAGMA table_info returns rows whose name is at index 1.
-        migrations = {
-            "remediation_records": {
+        _ensure_columns(
+            connection,
+            "remediation_records",
+            {
                 "recorded_by": "TEXT NOT NULL DEFAULT ''",
                 "validated_by": "TEXT NOT NULL DEFAULT ''",
                 "change_reason": "TEXT NOT NULL DEFAULT ''",
             },
-            "remediation_history": {
+        )
+
+        _ensure_columns(
+            connection,
+            "remediation_history",
+            {
                 "recorded_by": "TEXT NOT NULL DEFAULT ''",
                 "validated_by": "TEXT NOT NULL DEFAULT ''",
                 "change_reason": "TEXT NOT NULL DEFAULT ''",
                 "event_type": "TEXT NOT NULL DEFAULT 'UPSERT'",
             },
-        }
-        for table, columns in migrations.items():
-            existing = {
-                row[1]
-                for row in connection.execute(
-                    f"PRAGMA table_info({table})"
-                ).fetchall()
-            }
-            for column, definition in columns.items():
-                if column not in existing:
-                    connection.execute(
-                        f"ALTER TABLE {table} ADD COLUMN {column} {definition}"
-                    )
+        )
 
 
 def remediation_status(record):
@@ -148,6 +152,26 @@ def remediation_status(record):
     return "IN_REMEDIATION"
 
 
+def _classify_event(previous_result, result):
+    """Classify a save operation based on the previous and new results."""
+    if previous_result is None:
+        return "VALIDATION" if result == "PASS" else "CREATED"
+
+    if previous_result == result:
+        return "UPDATED"
+
+    if result == "PASS":
+        return "VALIDATION"
+
+    if result == "FAIL":
+        return "REJECTED"
+
+    if result == "PENDING":
+        return "REOPENED"
+
+    return "UPDATED"
+
+
 def save_remediation(
     database_path,
     *,
@@ -162,9 +186,10 @@ def save_remediation(
     validated_by="",
     change_reason="",
 ):
-    """Save current remediation state and append an attributable history event.
+    """Save the current remediation state and append an audit event.
 
-    Actor fields remain optional for backward compatibility with existing callers.
+    Actor and change metadata are optional for backward compatibility.
+    The current record update and history insert share one transaction.
     """
     control_id = str(control_id or "").strip()
     finding_type = str(finding_type or "").strip()
@@ -201,15 +226,27 @@ def save_remediation(
                 "validated_at must be ISO 8601 with a timezone"
             )
     else:
-        # Do not leave a previous validation date as the current date
-        # when the remediation returns to PENDING or changes to FAIL.
+        # Do not retain a previous validation timestamp after reopening
+        # a remediation or rejecting the verification.
         validated_at = ""
-
-    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     initialize_remediation_store(database_path)
 
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+
     with closing(sqlite3.connect(database_path)) as connection, connection:
+        previous = connection.execute(
+            """
+            SELECT verification_result
+            FROM remediation_records
+            WHERE control_id = ? AND finding_type = ?
+            """,
+            (control_id, finding_type),
+        ).fetchone()
+
+        previous_result = previous[0] if previous else None
+        event_type = _classify_event(previous_result, result)
+
         connection.execute(
             """
             INSERT INTO remediation_records (
@@ -282,7 +319,7 @@ def save_remediation(
                 recorded_by,
                 validated_by,
                 change_reason,
-                "VALIDATION" if result == "PASS" else "UPSERT",
+                event_type,
             ),
         )
 
@@ -317,7 +354,7 @@ def load_remediations(database_path=DEFAULT_DATABASE):
                 """
             ).fetchall()
         except sqlite3.OperationalError:
-            # The database exists but does not contain the expected table.
+            # The database exists but lacks the expected table.
             return []
 
     results = []
