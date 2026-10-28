@@ -1,4 +1,4 @@
-"""Persistent, auditable remediation register backed by SQLite.
+﻿"""Persistent, auditable remediation register backed by SQLite.
 
 A remediation is considered VALIDATED only when:
 - verification_result is PASS;
@@ -10,6 +10,7 @@ trail, but it is not immutable against direct database modification.
 """
 
 import argparse
+import json
 import sqlite3
 from contextlib import closing
 from datetime import datetime, timezone
@@ -117,6 +118,8 @@ def initialize_remediation_store(database_path=DEFAULT_DATABASE):
                 "validated_by": "TEXT NOT NULL DEFAULT ''",
                 "change_reason": "TEXT NOT NULL DEFAULT ''",
                 "event_type": "TEXT NOT NULL DEFAULT 'UPSERT'",
+                "before_snapshot": "TEXT",
+                "after_snapshot": "TEXT",
             },
         )
 
@@ -235,16 +238,24 @@ def save_remediation(
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     with closing(sqlite3.connect(database_path)) as connection, connection:
+        connection.row_factory = sqlite3.Row
         previous = connection.execute(
             """
-            SELECT verification_result
+            SELECT
+                control_id, finding_type, owner, corrective_action,
+                evidence_reference, validated_at, verification_result,
+                updated_at, recorded_by, validated_by, change_reason
             FROM remediation_records
             WHERE control_id = ? AND finding_type = ?
             """,
             (control_id, finding_type),
         ).fetchone()
 
-        previous_result = previous[0] if previous else None
+        previous_snapshot = (
+            json.dumps(dict(previous), sort_keys=True, ensure_ascii=False)
+            if previous else None
+        )
+        previous_result = previous["verification_result"] if previous else None
         event_type = _classify_event(previous_result, result)
 
         connection.execute(
@@ -289,6 +300,22 @@ def save_remediation(
             ),
         )
 
+        current = connection.execute(
+            """
+            SELECT
+                control_id, finding_type, owner, corrective_action,
+                evidence_reference, validated_at, verification_result,
+                updated_at, recorded_by, validated_by, change_reason
+            FROM remediation_records
+            WHERE control_id = ? AND finding_type = ?
+            """,
+            (control_id, finding_type),
+        ).fetchone()
+
+        current_snapshot = json.dumps(
+            dict(current), sort_keys=True, ensure_ascii=False
+        )
+
         connection.execute(
             """
             INSERT INTO remediation_history (
@@ -303,9 +330,11 @@ def save_remediation(
                 recorded_by,
                 validated_by,
                 change_reason,
-                event_type
+                event_type,
+                before_snapshot,
+                after_snapshot
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 control_id,
@@ -320,6 +349,8 @@ def save_remediation(
                 validated_by,
                 change_reason,
                 event_type,
+                previous_snapshot,
+                current_snapshot,
             ),
         )
 
@@ -368,8 +399,11 @@ def load_remediations(database_path=DEFAULT_DATABASE):
 
 
 
+
+
+
 def load_remediation_history(database_path=DEFAULT_DATABASE):
-    """Load remediation audit events in reverse chronological order."""
+    """Load remediation audit events with backward-compatible schema support."""
     path = Path(database_path)
 
     if not path.exists():
@@ -379,22 +413,65 @@ def load_remediation_history(database_path=DEFAULT_DATABASE):
         connection.row_factory = sqlite3.Row
 
         try:
+            existing_tables = {
+                row["name"]
+                for row in connection.execute(
+                    """
+                    SELECT name
+                    FROM sqlite_master
+                    WHERE type = 'table'
+                    """
+                ).fetchall()
+            }
+
+            if "remediation_history" not in existing_tables:
+                return []
+
+            existing_columns = {
+                row["name"]
+                for row in connection.execute(
+                    "PRAGMA table_info(remediation_history)"
+                ).fetchall()
+            }
+
+            required_columns = [
+                "history_id",
+                "recorded_at",
+                "control_id",
+                "finding_type",
+                "owner",
+                "corrective_action",
+                "evidence_reference",
+                "validated_at",
+                "verification_result",
+            ]
+
+            if not set(required_columns).issubset(existing_columns):
+                return []
+
+            optional_columns = [
+                "event_type",
+                "recorded_by",
+                "validated_by",
+                "change_reason",
+                "before_snapshot",
+                "after_snapshot",
+            ]
+
+            selected_columns = required_columns + [
+                column
+                for column in optional_columns
+                if column in existing_columns
+            ]
+
             rows = connection.execute(
-                """
-                SELECT
-                    history_id,
-                    recorded_at,
-                    control_id,
-                    finding_type,
-                    owner,
-                    corrective_action,
-                    evidence_reference,
-                    validated_at,
-                    verification_result
+                f"""
+                SELECT {", ".join(selected_columns)}
                 FROM remediation_history
                 ORDER BY recorded_at DESC, history_id DESC
                 """
             ).fetchall()
+
         except sqlite3.OperationalError:
             return []
 
@@ -403,20 +480,25 @@ def load_remediation_history(database_path=DEFAULT_DATABASE):
     for row in rows:
         record = dict(row)
 
-        # Compatibility with the dashboard export schema.
-        record["event_type"] = (
-            "VALIDATION"
-            if record.get("validated_at")
-            or record.get("verification_result") not in ("", "PENDING", None)
-            else "REMEDIATION_UPDATE"
-        )
-        record["recorded_by"] = ""
-        record["validated_by"] = ""
-        record["change_reason"] = ""
+        record.setdefault("recorded_by", "")
+        record.setdefault("validated_by", "")
+        record.setdefault("change_reason", "")
+        record.setdefault("before_snapshot", None)
+        record.setdefault("after_snapshot", None)
+
+        if not record.get("event_type"):
+            record["event_type"] = (
+                "VALIDATION"
+                if record.get("validated_at")
+                or record.get("verification_result")
+                not in ("", "PENDING", None)
+                else "REMEDIATION_UPDATE"
+            )
 
         results.append(record)
 
     return results
+
 
 
 
