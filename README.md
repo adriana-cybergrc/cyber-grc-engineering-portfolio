@@ -172,6 +172,35 @@ The roadmap prioritizes verifiable engineering progress, clear requirements, and
 - [ ] Document the remediation data model and event semantics.
 - [ ] Assess integrity protections, access controls, and production deployment requirements.
 
+### Intelligent Vulnerability Management
+
+**Objective:** Build an auditable, risk-based vulnerability management capability integrated with the GRC Automation Lab and the future Agentic GRC Engineering architecture.
+
+**Planned capabilities**
+- [ ] Consolidate vulnerability findings from scan exports and authorized data sources.
+- [ ] Track vulnerabilities by country, asset, business criticality, remediation owner, and service provider.
+- [ ] Prioritize remediation using severity, exploitability, exposure, and business context.
+- [ ] Monitor remediation SLAs, overdue findings, aging, exceptions, and third-party dependencies.
+- [ ] Track remediation plans, accountable owners, deadlines, and supporting evidence.
+- [ ] Distinguish open, in progress, awaiting action plan, awaiting validation, remediated, and non-executable findings.
+- [ ] Validate remediation through authorized retesting or other defined verification evidence.
+- [ ] Produce executive metrics for vulnerability exposure, SLA compliance, remediation performance, and recurring findings.
+- [ ] Integrate validated results with the GRC findings register, remediation records, analytics, and executive dashboards.
+
+**Agentic integration**
+- [ ] Allow the GRC Orchestrator to query vulnerability data and explain risk prioritization.
+- [ ] Detect overdue SLAs and missing remediation plans.
+- [ ] Recommend actions and prepare notifications for accountable teams and providers.
+- [ ] Require authorization for consequential actions and preserve a complete audit trail.
+
+**Implementation sequence**
+1. Establish the vulnerability data model and import/validation pipeline.
+2. Implement risk prioritization, SLA monitoring, and remediation tracking.
+3. Integrate vulnerability records with existing GRC persistence and reporting.
+4. Add automated tests, evidence validation, and executive metrics.
+5. Expose controlled tools to the AI agent after the underlying workflow is reliable.
+
+
 ### Data Governance
 
 - [ ] Specify the Data Trust & Control Graph architecture.
