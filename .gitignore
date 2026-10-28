@@ -221,3 +221,15 @@ __marimo__/
 
 # Runtime audit database
 projects/grc-automation-lab/runtime/
+
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Local backups and review packages
+*.backup.*
+*.previous.*
+README.backup.md
+grc-automation-lab-review.zip
