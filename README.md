@@ -6,7 +6,7 @@
 
 An independent engineering portfolio exploring how cybersecurity governance, enterprise risk, data governance, automation, and responsible AI can be translated into practical, measurable, and auditable technical solutions.
 
-[Featured Projects](#-featured-projects) · [Live Demonstrations](#-live-demonstrations) · [Engineering Principles](#-engineering-principles) · [Technology & Frameworks](#-technology--frameworks) · [Roadmap](#-roadmap)
+[Featured Projects](#-featured-projects) · [Live Demonstrations](#-live-demonstrations) · [Engineering Principles](#-engineering-principles) · [Technology & Frameworks](#-technology--frameworks) · [Master Roadmap](docs/CYBER_GRC_ENGINEERING_MASTER_ROADMAP.md) · [Implementation Roadmap](#-roadmap)
 
 ---
 
@@ -156,6 +156,12 @@ Technologies are listed according to their use across the portfolio. Not every p
 Frameworks are selected according to each project's scope. References do not imply certification, complete compliance, or verified control effectiveness. Applicable versions and requirements must be confirmed during implementation.
 
 ---
+
+## ◈ Portfolio Strategy & Master Roadmap
+
+The [Cyber GRC Engineering Master Roadmap](docs/CYBER_GRC_ENGINEERING_MASTER_ROADMAP.md) defines the portfolio's strategic direction, architecture, engineering pillars, implementation phases, and governance principles.
+
+It complements this README's implementation roadmap and the project-specific documentation. Roadmap capabilities remain planned until their implementation and validation are supported by repository evidence.
 
 ## ◈ Roadmap
 
