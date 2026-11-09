@@ -115,8 +115,22 @@ Model evidence separately as EvidenceRecord (submission/status/validity metadata
 - [ ] Prove dashboards, reports and existing tests remain unchanged.
 - [ ] Obtain explicit approval for a separate implementation PR.
 
-## 6. Next increment
+## 6. Read-only profiler implementation
 
-Build a read-only SQLite schema/data profiler against a copy or generated synthetic database. Produce a reconciliation report and crosswalk specification. Do not alter user/production data or existing schema in this increment.
+Added `tools/grc_sqlite_profiler.py` and `tests/test_grc_sqlite_profiler.py`. The tool opens SQLite using URI `mode=ro`, enables `PRAGMA query_only`, and reports object names, columns, indexes, foreign keys, row counts and migration version/name metadata. It does not export business row values or write to the inspected database.
+
+Tests cover schema/count reporting, non-export of sensitive row values, unchanged database bytes and missing-file failure. The profiler tests passed in GitHub Actions run [42670487137](https://github.com/adriana-cybergrc/cyber-grc-engineering-portfolio/actions/runs/42670487137). The latest expanded test run is also executing against the subsequent documentation/CI commit.
+
+Example (use a sanitized copy, not a production database):
+
+```powershell
+python tools/grc_sqlite_profiler.py --database .\\projects\\grc-automation-lab\\runtime\\grc_audit.db --output .\\runtime\\grc_schema_profile.json
+```
+
+The report path is separate from the inspected database. Do not commit real database files or reports containing sensitive metadata.
+
+## 7. Next increment
+
+Run the profiler against a sanitized copy or reproducible synthetic database. Review actual migration/index/FK metadata and produce a read-only crosswalk for both remediation models. No schema consolidation, write-path change or production data modification is included.
 
 **Change log:** R0.1 maps inspected CSV/SQLite fields, documents the two remediation models, identifies evidence and identity limitations, and defines safe validation gates.
