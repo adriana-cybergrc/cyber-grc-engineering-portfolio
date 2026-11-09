@@ -523,3 +523,10 @@ Tenable is not mandatory. OpenVAS/Greenbone is a candidate source, not an implem
 ### 12.5 Change control
 
 Do not replace existing dashboards, code, CSV fixtures, SQLite migrations or tests without a reviewed migration plan. Preserve behavior through regression tests. Do not claim production readiness or integration until verified by repository evidence.
+
+
+### 12.6 Field-level source mapping and remediation reconciliation
+
+- [CRISC-MAP-002 — GRC Automation Lab Field-to-Canonical Mapping](architecture/CRISC-MAP-002_GRC_FIELD_TO_CANONICAL_MAPPING_R0.1.md)
+
+Source inspection identified two coexisting SQLite remediation models: `remediation_cases/events` and `remediation_records/history`. They have different keys, schemas and consumers. The next increment is read-only schema/data profiling and crosswalk design; no consolidation or destructive migration is authorized. Evidence CSV rows are submission/expiry metadata, not proof of stored evidence artifacts.

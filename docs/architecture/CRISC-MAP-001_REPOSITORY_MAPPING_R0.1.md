@@ -62,7 +62,7 @@ SAP SoD analyzer reads synthetic user/function assignments and conflict matrix, 
 For each table/CSV: inventory exact field names, types, nullability, keys and allowed values; map to canonical entity/attribute; define transformation/defaults; preserve raw values/source; assign confidence; record open questions; add positive/negative/boundary/migration tests; verify no existing records or behavior are lost.
 
 - MAP-P0: inspect SQLite tables, migrations, CSV headers and fixtures.
-- MAP-P1: field-level mappings for GRC Automation Lab and Risk Register.
+- MAP-P1: field-level mappings for GRC Automation Lab and Risk Register — documented in CRISC-MAP-002 R0.1; physical data profiling remains open.
 - MAP-P2: scanner observation schema and sanitized OpenVAS/current Tenable CSV mapping.
 - MAP-P3: map SAP SoD synthetic users/functions/rules/findings.
 - MAP-P4: design TPRM, DLP, Data Governance, AI Security and ESG entities; do not create empty folders.
@@ -70,4 +70,4 @@ For each table/CSV: inventory exact field names, types, nullability, keys and al
 
 Do not replace code, CSVs, dashboards, SQLite migrations or tests as part of mapping. Add documentation first; any schema/code change must be isolated, tested, diff-reviewed and approved.
 
-**Change log:** R0.1 records repository baseline, implementation boundaries, inconsistencies, gaps and mapping procedure.
+**Change log:** R0.1 records repository baseline, implementation boundaries, inconsistencies, gaps and mapping procedure. CRISC-MAP-002 R0.1 adds field-level mappings and remediation-model reconciliation.

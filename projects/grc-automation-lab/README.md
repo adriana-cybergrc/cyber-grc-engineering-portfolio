@@ -131,3 +131,10 @@ The Vulnerability Management dashboard is a separate CSV/browser prototype. It i
 See [CRISC Reference Architecture](../../docs/architecture/CRISC-ARCH-001_REFERENCE_ARCHITECTURE_R0.1.md), [Shared Data Model](../../docs/architecture/CRISC-DATA-001_SHARED_DATA_MODEL_R0.1.md) and [Repository Mapping](../../docs/architecture/CRISC-MAP-001_REPOSITORY_MAPPING_R0.1.md).
 
 All future changes must preserve existing behavior and pass regression/integration tests.
+
+
+## Field mapping and remediation-model reconciliation
+
+The source CSVs and SQLite structures have been mapped to the CRISC logical model in [CRISC-MAP-002](../../docs/architecture/CRISC-MAP-002_GRC_FIELD_TO_CANONICAL_MAPPING_R0.1.md). Two remediation models currently coexist; do not consolidate or migrate them until the read-only crosswalk, conflict rules and backward-compatibility tests are reviewed.
+
+Evidence CSV rows track evidence names, submission status and dates; they do not by themselves establish storage or integrity of evidence artifacts.

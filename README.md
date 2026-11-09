@@ -6,7 +6,7 @@
 
 An independent engineering portfolio exploring how cybersecurity governance, enterprise risk, data governance, automation, and responsible AI can be translated into practical, measurable, and auditable technical solutions.
 
-[Featured Projects](#-featured-projects) · [Live Demonstrations](#-live-demonstrations) · [Engineering Principles](#-engineering-principles) · [Technology & Frameworks](#-technology--frameworks) · [Master Roadmap](docs/CYBER_GRC_ENGINEERING_MASTER_ROADMAP.md) · [CRISC Architecture](docs/architecture/CRISC-ARCH-001_REFERENCE_ARCHITECTURE_R0.1.md) · [Shared Data Model](docs/architecture/CRISC-DATA-001_SHARED_DATA_MODEL_R0.1.md) · [Implementation Roadmap](#-roadmap)
+[Featured Projects](#-featured-projects) · [Live Demonstrations](#-live-demonstrations) · [Engineering Principles](#-engineering-principles) · [Technology & Frameworks](#-technology--frameworks) · [Master Roadmap](docs/CYBER_GRC_ENGINEERING_MASTER_ROADMAP.md) · [CRISC Architecture](docs/architecture/CRISC-ARCH-001_REFERENCE_ARCHITECTURE_R0.1.md) · [Shared Data Model](docs/architecture/CRISC-DATA-001_SHARED_DATA_MODEL_R0.1.md) · [GRC Field Mapping](docs/architecture/CRISC-MAP-002_GRC_FIELD_TO_CANONICAL_MAPPING_R0.1.md) · [Implementation Roadmap](#-roadmap)
 
 ---
 

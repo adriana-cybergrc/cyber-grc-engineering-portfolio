@@ -71,7 +71,7 @@ erDiagram
 
 Illustrative ERD only; physical schema and exact optionality/cardinality require further design.
 
-## Physical design gates
+## Current implementation caveat\n\nThe GRC Automation Lab currently has both a finding-linked remediation lifecycle (\`remediation_cases\` / \`remediation_events\`) and a separate register/history implementation (\`remediation_records\` / \`remediation_history\`). They are not interchangeable and are not yet reconciled to one physical canonical schema. See [CRISC-MAP-002](CRISC-MAP-002_GRC_FIELD_TO_CANONICAL_MAPPING_R0.1.md). Evidence CSV records are submission/expiry metadata; artifact storage and integrity metadata are not established by those rows.\n\n## Physical design gates
 
 Before SQL/migrations: inventory current SQLite schemas/data access; map columns/keys; define PK/FK, uniqueness/idempotency; define history/migration strategy; define classification/retention/access; add migration/backward-compatibility tests; prove existing GRC behavior/data remain intact.
 

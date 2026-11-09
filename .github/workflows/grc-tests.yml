@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "src/**"
+      - "README.md"\n      - "docs/**"\n      - "src/**"
       - "tests/**"
       - "projects/grc-automation-lab/**"
       - "projects/sap-grc-sod-lab/**"
