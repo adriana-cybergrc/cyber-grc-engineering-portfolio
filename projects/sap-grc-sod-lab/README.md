@@ -1,20 +1,29 @@
 # SAP Security & SAP GRC — Segregation of Duties Lab
 
+**Status:** Implemented prototype — synthetic data only  
+**Maturity:** Rule-based conflict detection with unit tests; not production SAP integration.
+
 ## Objective
 
-Demonstrate automated identification of potential Segregation of Duties (SoD) conflicts using synthetic user access data and configurable business rules.
+Demonstrate identification of potential SoD conflicts using synthetic user access data and configurable business rules.
 
-## Scope
+## Implemented scope
 
-- Synthetic user-to-function assignments
-- Configurable SoD conflict rules
-- Python-based conflict detection
-- CSV findings report
-- Automated unit tests
+- Synthetic user-to-business-function assignments.
+- Configurable SoD conflict rules in CSV.
+- Python conflict detection.
+- CSV findings with `REQUIRES_REVIEW`.
+- Unit tests for conflict and non-conflict scenarios.
+
+## Repository structure
+
+- `data/users_roles.csv` — synthetic user/function assignments.
+- `data/sod_rules.csv` — illustrative conflict matrix.
+- `src/sod_analyzer.py` — analyzer.
+- `tests/test_sod_analyzer.py` — automated tests.
+- `sod_findings.csv` — sample output.
 
 ## Execution
-
-Run from the repository root:
 
 ```powershell
 python projects/sap-grc-sod-lab/src/sod_analyzer.py --users projects/sap-grc-sod-lab/data/users_roles.csv --rules projects/sap-grc-sod-lab/data/sod_rules.csv --output projects/sap-grc-sod-lab/sod_findings.csv
@@ -26,19 +35,8 @@ python projects/sap-grc-sod-lab/src/sod_analyzer.py --users projects/sap-grc-sod
 python -m unittest discover -s projects/sap-grc-sod-lab/tests -v
 ```
 
-## Governance note
+## Governance and limitations
 
-Findings are risk indicators that require review. They do not prove fraud or automatically establish a policy violation. Real-world use requires approved conflict rules, role semantics, business context, and assessment of compensating controls.
+Findings are indicators requiring review; they do not prove fraud or automatically establish a policy violation. Real-world use requires approved rules, role semantics, business context, compensating-control assessment, ownership and reviewer sign-off.
 
-All data in this lab is synthetic.
-# SAP GRC Segregation of Duties (SoD) Lab
-
-**Status:** Planned
-
-## Intended scope
-- Synthetic business functions and conflicting permissions.
-- Rule matrix for illustrative SoD conflicts.
-- Risk severity, mitigating controls, and reviewer sign-off.
-- Test cases for rule matching and false-positive review.
-
-This is a learning lab, not a representation of SAP GRC Access Control configuration or an official SAP ruleset.
+This lab does not connect to SAP systems, represent SAP GRC Access Control configuration, use an official SAP ruleset or automate mitigation approval. All data is synthetic.

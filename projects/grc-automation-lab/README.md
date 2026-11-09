@@ -121,3 +121,31 @@ The next engineering iterations should prioritize:
 This project is an independent educational portfolio. It uses synthetic demonstration data and is not affiliated with or endorsed by any employer, vendor, or standards organization.
 
 Validate data quality, calculation logic, security requirements, and governance controls before adapting any component to a real operational environment.
+
+## CRISC architecture alignment
+
+The GRC Automation Lab is the current core implementation candidate for control evaluation, evidence-related findings, remediation records/history, analytics and audit-oriented reporting. Preserve its Python modules, SQLite migrations, test suite and data contracts while the CRISC shared model is mapped.
+
+The Vulnerability Management dashboard is a separate CSV/browser prototype. It is not connected to the GRC SQLite database and does not ingest scanner APIs. Future integration must use a separate normalized adapter and approved field mapping; do not couple scanner-specific fields directly to existing remediation tables.
+
+See [CRISC Reference Architecture](../../docs/architecture/CRISC-ARCH-001_REFERENCE_ARCHITECTURE_R0.1.md), [Shared Data Model](../../docs/architecture/CRISC-DATA-001_SHARED_DATA_MODEL_R0.1.md) and [Repository Mapping](../../docs/architecture/CRISC-MAP-001_REPOSITORY_MAPPING_R0.1.md).
+
+All future changes must preserve existing behavior and pass regression/integration tests.
+
+
+## Field mapping and remediation-model reconciliation
+
+The source CSVs and SQLite structures have been mapped to the CRISC logical model in [CRISC-MAP-002](../../docs/architecture/CRISC-MAP-002_GRC_FIELD_TO_CANONICAL_MAPPING_R0.1.md). Two remediation models currently coexist; do not consolidate or migrate them until the read-only crosswalk, conflict rules and backward-compatibility tests are reviewed.
+
+Evidence CSV rows track evidence names, submission status and dates; they do not by themselves establish storage or integrity of evidence artifacts.
+
+
+## Read-only SQLite schema profiling
+
+A non-destructive schema profiler is available at `tools/grc_sqlite_profiler.py`. It reports schema metadata, indexes, foreign keys, migration version/name and row counts without exporting business records. It opens the target database in read-only mode. Run it only against a sanitized copy when preparing review evidence:
+
+```powershell
+python tools/grc_sqlite_profiler.py --database .\\projects\\grc-automation-lab\\runtime\\grc_audit.db --output .\\runtime\\grc_schema_profile.json
+```
+
+Automated tests: `python -m unittest discover -s tests -v`.

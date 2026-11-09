@@ -6,7 +6,7 @@
 
 An independent engineering portfolio exploring how cybersecurity governance, enterprise risk, data governance, automation, and responsible AI can be translated into practical, measurable, and auditable technical solutions.
 
-[Featured Projects](#-featured-projects) · [Live Demonstrations](#-live-demonstrations) · [Engineering Principles](#-engineering-principles) · [Technology & Frameworks](#-technology--frameworks) · [Master Roadmap](docs/CYBER_GRC_ENGINEERING_MASTER_ROADMAP.md) · [Implementation Roadmap](#-roadmap)
+[Featured Projects](#-featured-projects) · [Live Demonstrations](#-live-demonstrations) · [Engineering Principles](#-engineering-principles) · [Technology & Frameworks](#-technology--frameworks) · [Master Roadmap](docs/CYBER_GRC_ENGINEERING_MASTER_ROADMAP.md) · [CRISC Architecture](docs/architecture/CRISC-ARCH-001_REFERENCE_ARCHITECTURE_R0.1.md) · [Shared Data Model](docs/architecture/CRISC-DATA-001_SHARED_DATA_MODEL_R0.1.md) · [GRC Field Mapping](docs/architecture/CRISC-MAP-002_GRC_FIELD_TO_CANONICAL_MAPPING_R0.1.md) · [Implementation Roadmap](#-roadmap)
 
 ---
 
@@ -38,10 +38,14 @@ Explore the current engineering labs, demonstrations, and research initiatives.
 | [**GRC Executive Dashboard**](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/grc-executive/grc_executive_dashboard.html) | Executive visibility and governance indicators | Published prototype |
 | [**Vulnerability Management Dashboard**](https://adriana-cybergrc.github.io/cyber-grc-engineering-portfolio/projects/grc-automation-lab/dashboards/vulnerability-management/vulnerability_executive_dashboard.html) | Vulnerability exposure, remediation SLAs, and CSV analysis | Published prototype |
 | [**Cyber GRC Risk Register**](projects/cyber-grc-risk-register/README.md) | Risk scenarios, scoring, and input validation | Initial project |
-| **Data Trust & Control Graph** | Data quality, ownership, lineage, and governance controls | Planned |
+| **Data Governance & Data Trust** | Data asset ownership, classification, lineage, quality and control assurance | Planned |
+| **DLP & Data Protection Assurance** | Data movement events, policy violations, investigations and governance evidence | Planned |
+| **Third-Party Risk Management (TPRM)** | Supplier inventory, CSRA, fourth-party dependencies and remediation assurance | Planned |
+| **KPI / KRI / KCI Intelligence** | Shared metric definitions, lineage, thresholds and executive reporting | Planned |
 | **ESG Evidence & Risk Assurance Engine** | Sustainability data reliability, evidence traceability, and control assurance | Planned |
+| **AI Security Assurance** | AI threat modeling and technical security assurance, separate from AI governance | Planned |
 | [**SAP Security Lab**](projects/sap-security-lab/README.md) | SAP access governance and authorization concepts | Planned |
-| [**SAP GRC Segregation of Duties Lab**](projects/sap-grc-sod-lab/README.md) | Segregation of duties and mitigation concepts | Planned |
+| [**SAP GRC Segregation of Duties Lab**](projects/sap-grc-sod-lab/README.md) | Synthetic SoD conflict detection and review-required findings | Implemented prototype |
 | [**AI Cyber Risk Governance**](projects/ai-cyber-risk-governance/README.md) | AI risk controls and human oversight | Planned |
 | [**Cybersecurity Research**](projects/cybersecurity-research/README.md) | Research notes, technical analysis, and case studies | Planned |
 
@@ -165,75 +169,63 @@ It complements this README's implementation roadmap and the project-specific doc
 
 ## ◈ Roadmap
 
-The roadmap prioritizes verifiable engineering progress, clear requirements, and reproducible results over feature count.
+The roadmap is dependency-driven. Existing implementations remain intact; new capabilities are added through versioned specifications, non-destructive changes and reproducible tests.
 
-### GRC Automation & Remediation Assurance
+### Core GRC & Assurance
+- [x] Python control evaluation and exception generation.
+- [x] SQLite audit persistence and remediation records/history.
+- [x] Analytics and executive dashboard generation.
+- [x] Automated tests for core GRC behavior and integration paths.
+- [ ] Extend cross-domain identifiers/data contracts without replacing existing tables.
+- [ ] Complete field-level mapping of current SQLite entities and CSV inputs.
+- [ ] Strengthen evidence metadata, lineage and audit-event semantics.
 
-- [x] Implement persistent remediation records.
-- [x] Record remediation metadata and validation outcomes.
-- [x] Preserve before-and-after snapshots in remediation history.
-- [x] Add backward-compatible handling for legacy audit-history schemas.
-- [x] Validate the implementation with the automated test suite.
-- [ ] Expand automated tests for additional edge cases and audit-history integrity.
-- [ ] Document the remediation data model and event semantics.
-- [ ] Assess integrity protections, access controls, and production deployment requirements.
+### Vulnerability Management — Scanner-Agnostic
+**Current implementation:** standalone HTML/JavaScript dashboard; CSV import/export; browser-side filtering, KPIs, visual summaries and print. No direct scanner API, scheduled ingestion or centralized scanner repository is implemented.
 
-### Intelligent Vulnerability Management
+**Target:** accept multiple scanner sources through independent adapters and normalize observations into a shared CRISC model. Tenable is not mandatory; Greenbone/OpenVAS is an explicit candidate.
 
-**Objective:** Build an auditable, risk-based vulnerability management capability integrated with the GRC Automation Lab and the future Agentic GRC Engineering architecture.
+- [x] Publish CSV-based executive dashboard prototype.
+- [x] Document current limitations and preserve the dashboard.
+- [ ] VM-P0: validate CSV schema, behavior and synthetic fixtures.
+- [ ] VM-P1: implement/test Greenbone/OpenVAS XML parser using sanitized/synthetic reports.
+- [ ] VM-P2: add Tenable CSV/JSON adapters against the same canonical model.
+- [ ] VM-P3: evaluate Qualys/Rapid7 adapters using validated source contracts.
+- [ ] VM-P4: assess other scanners and authorized API integrations.
+- [ ] VM-P5: implement cross-scanner correlation, historical observations and risk analytics.
+- [ ] Integrate vulnerability observations with asset criticality, business context, remediation and verified closure.
 
-**Planned capabilities**
-- [ ] Consolidate vulnerability findings from scan exports and authorized data sources.
-- [ ] Track vulnerabilities by country, asset, business criticality, remediation owner, and service provider.
-- [ ] Prioritize remediation using severity, exploitability, exposure, and business context.
-- [ ] Monitor remediation SLAs, overdue findings, aging, exceptions, and third-party dependencies.
-- [ ] Track remediation plans, accountable owners, deadlines, and supporting evidence.
-- [ ] Distinguish open, in progress, awaiting action plan, awaiting validation, remediated, and non-executable findings.
-- [ ] Validate remediation through authorized retesting or other defined verification evidence.
-- [ ] Produce executive metrics for vulnerability exposure, SLA compliance, remediation performance, and recurring findings.
-- [ ] Integrate validated results with the GRC findings register, remediation records, analytics, and executive dashboards.
+See [CRISC-VM-001](docs/architecture/CRISC-VM-001_SCANNER_AGNOSTIC_VULNERABILITY_MANAGEMENT_R0.1.md).
 
-**Agentic integration**
-- [ ] Allow the GRC Orchestrator to query vulnerability data and explain risk prioritization.
-- [ ] Detect overdue SLAs and missing remediation plans.
-- [ ] Recommend actions and prepare notifications for accountable teams and providers.
-- [ ] Require authorization for consequential actions and preserve a complete audit trail.
+### Cross-Domain Governance Domains
+- [ ] **TPRM / CSRA:** supplier inventory/criticality, due diligence, inherent/residual risk, contractual controls, fourth-party/concentration risk, remediation and assurance.
+- [ ] **DLP:** data classification/discovery, movement events, policy violations, investigation and evidence; integrate Data Governance, Privacy and IAM.
+- [ ] **Data Governance:** data assets, owners/stewards, classification, lineage, quality rules and accountable remediation.
+- [ ] **KPI / KRI / KCI Engine:** shared metric dictionary, formulas, owners, source lineage, period, thresholds, data quality, trends and escalation.
+- [ ] **AI Governance:** AI inventory, use cases, business purpose, risk classification, human oversight and governance controls.
+- [ ] **AI Security:** technical threat modeling and security assurance, distinct from AI management-system governance.
+- [ ] **ESG Assurance:** sustainability methodology, reporting boundary, source evidence, estimation status, traceability and assurance limitations.
+- [ ] **Business Resilience:** BIA, process/dependency mapping, continuity, recovery objectives, exercises, incidents and remediation.
+- [ ] **IAM / SAP / SoD:** extend synthetic identity and access governance examples; preserve the existing SoD prototype.
 
-**Implementation sequence**
-1. Establish the vulnerability data model and import/validation pipeline.
-2. Implement risk prioritization, SLA monitoring, and remediation tracking.
-3. Integrate vulnerability records with existing GRC persistence and reporting.
-4. Add automated tests, evidence validation, and executive metrics.
-5. Expose controlled tools to the AI agent after the underlying workflow is reliable.
+### Delivery Priorities
 
+| Priority | Scope | Exit condition |
+|---|---|---|
+| P0 — Reconcile | Inventory repository, align README/roadmap/status, preserve code/tests | Accurate baseline; no destructive changes |
+| P1 — Core model | Shared data model, field mappings, metric dictionary and data quality | Approved logical model and migration plan |
+| P2 — Vulnerability + TPRM | Multi-scanner adapters, observations, CSRA and supplier risk | Reproducible fixtures, provenance and tests |
+| P3 — DLP + Data + Identity | DLP events/violations, data governance, privacy, IAM/SAP | Clear semantics and traceable remediation |
+| P4 — AI Governance + AI Security | AI inventory, governance assessment, technical security assurance | Distinct scopes, evidence and human approval |
+| P5 — Resilience + ESG + Intelligence | BCM, ESG assurance, cross-domain analytics and governed AI | Validated metrics and accountable workflows |
 
-### Data Governance
-
-- [ ] Specify the Data Trust & Control Graph architecture.
-- [ ] Define data asset ownership, stewardship, classification, and lineage models.
-- [ ] Implement synthetic data quality rules and validation results.
-- [ ] Link data quality findings to controls, accountable owners, and remediation actions.
-- [ ] Produce traceable governance indicators and technical documentation.
-
-### ESG Governance & Assurance
-
-- [ ] Define the ESG Evidence & Risk Assurance Engine scope.
-- [ ] Model sustainability indicators, source data, methodologies, and evidence references.
-- [ ] Implement validation for completeness, consistency, traceability, and reporting periods.
-- [ ] Identify unsupported, estimated, or inconsistent indicators.
-- [ ] Connect findings to risk, control, and remediation records.
-- [ ] Document assurance limitations and applicable reporting requirements.
-
-### AI, Digital Risk & Enterprise Governance
-
-- [ ] Develop an AI cyber risk assessment example with explicit human review.
-- [ ] Explore reusable control-to-evidence mappings.
-- [ ] Develop SAP segregation-of-duties rules and mitigation scenarios.
-- [ ] Investigate integration patterns across cyber risk, data governance, and ESG assurance.
-
-Roadmap items remain planned until implementation and relevant validation have been completed.
-
----
+### Publication and maturity rules
+- A roadmap item is not an implemented feature.
+- A connector is not supported until adapter, mapping, tests and security controls exist.
+- Scanner severity is not equivalent to business risk.
+- A finding disappearing from a later scan is not proof of remediation.
+- Public examples use synthetic or sanitized data only.
+- Preserve existing files/behavior; review diffs and tests before merge.
 
 ## ◈ Repository Structure
 
