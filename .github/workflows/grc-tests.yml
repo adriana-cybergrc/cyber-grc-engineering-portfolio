@@ -46,4 +46,4 @@ jobs:
       - name: Run SAP GRC SoD Lab tests
         run: python -W error::ResourceWarning -m unittest discover -s projects/sap-grc-sod-lab/tests -v
       - name: Check Python compilation
-        run: python -m compileall -q src projects/grc-automation-lab/src projects/sap-grc-sod-lab/src
+        run: python -m compileall -q src tools projects/grc-automation-lab/src projects/sap-grc-sod-lab/src

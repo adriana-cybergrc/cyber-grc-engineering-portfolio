@@ -138,3 +138,14 @@ All future changes must preserve existing behavior and pass regression/integrati
 The source CSVs and SQLite structures have been mapped to the CRISC logical model in [CRISC-MAP-002](../../docs/architecture/CRISC-MAP-002_GRC_FIELD_TO_CANONICAL_MAPPING_R0.1.md). Two remediation models currently coexist; do not consolidate or migrate them until the read-only crosswalk, conflict rules and backward-compatibility tests are reviewed.
 
 Evidence CSV rows track evidence names, submission status and dates; they do not by themselves establish storage or integrity of evidence artifacts.
+
+
+## Read-only SQLite schema profiling
+
+A non-destructive schema profiler is available at `tools/grc_sqlite_profiler.py`. It reports schema metadata, indexes, foreign keys, migration version/name and row counts without exporting business records. It opens the target database in read-only mode. Run it only against a sanitized copy when preparing review evidence:
+
+```powershell
+python tools/grc_sqlite_profiler.py --database .\\projects\\grc-automation-lab\\runtime\\grc_audit.db --output .\\runtime\\grc_schema_profile.json
+```
+
+Automated tests: `python -m unittest discover -s tests -v`.

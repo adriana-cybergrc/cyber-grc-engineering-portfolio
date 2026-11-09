@@ -530,3 +530,8 @@ Do not replace existing dashboards, code, CSV fixtures, SQLite migrations or tes
 - [CRISC-MAP-002 — GRC Automation Lab Field-to-Canonical Mapping](architecture/CRISC-MAP-002_GRC_FIELD_TO_CANONICAL_MAPPING_R0.1.md)
 
 Source inspection identified two coexisting SQLite remediation models: `remediation_cases/events` and `remediation_records/history`. They have different keys, schemas and consumers. The next increment is read-only schema/data profiling and crosswalk design; no consolidation or destructive migration is authorized. Evidence CSV rows are submission/expiry metadata, not proof of stored evidence artifacts.
+
+
+### 12.7 Read-only SQLite profiling
+
+A read-only SQLite schema profiler has been added at `tools/grc_sqlite_profiler.py`, with unit tests in `tests/test_grc_sqlite_profiler.py`. It reports schema metadata, indexes, foreign keys, migration history and row counts without returning business records or modifying the inspected database. Next: execute it only against a sanitized copy or reproducible synthetic database, then review a remediation crosswalk. This does not authorize schema consolidation.
