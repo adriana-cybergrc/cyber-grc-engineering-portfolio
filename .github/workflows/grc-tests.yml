@@ -1,21 +1,22 @@
-
 name: Cyber GRC Quality Checks
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
+      - "src/**"
+      - "tests/**"
       - "projects/grc-automation-lab/**"
+      - "projects/sap-grc-sod-lab/**"
       - ".github/workflows/grc-tests.yml"
-
   pull_request:
-    branches:
-      - main
+    branches: [main]
     paths:
+      - "src/**"
+      - "tests/**"
       - "projects/grc-automation-lab/**"
+      - "projects/sap-grc-sod-lab/**"
       - ".github/workflows/grc-tests.yml"
-
   workflow_dispatch:
 
 permissions:
@@ -23,26 +24,22 @@ permissions:
 
 jobs:
   test:
-    name: Run GRC automated tests
+    name: Run repository Python tests
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-
       - name: Verify Python
         run: python --version
-
-      - name: Run automated tests
-        run: |
-          python -W error::ResourceWarning -m unittest discover \
-            -s projects/grc-automation-lab/tests -v
-
+      - name: Run GRC Automation Lab tests
+        run: python -W error::ResourceWarning -m unittest discover -s projects/grc-automation-lab/tests -v
+      - name: Run Cyber GRC Risk Register tests
+        run: python -W error::ResourceWarning -m unittest discover -s tests -v
+      - name: Run SAP GRC SoD Lab tests
+        run: python -W error::ResourceWarning -m unittest discover -s projects/sap-grc-sod-lab/tests -v
       - name: Check Python compilation
-        run: |
-          python -m compileall -q projects/grc-automation-lab/src
+        run: python -m compileall -q src projects/grc-automation-lab/src projects/sap-grc-sod-lab/src

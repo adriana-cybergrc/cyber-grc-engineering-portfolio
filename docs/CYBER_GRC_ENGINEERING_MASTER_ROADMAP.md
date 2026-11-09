@@ -479,3 +479,47 @@ The Master Roadmap serves as the strategic reference for portfolio sequencing. P
 ---
 
 **Guiding principle:** Build verifiable security capabilities first, connect them through traceable risk data, and introduce AI only where its role, authority and limitations are explicit.
+
+
+## 12. CRISC Consolidated Architecture and Domain Expansion (R0.2)
+
+This section supplements the strategic roadmap. Planned capabilities remain planned.
+
+### 12.1 Reference artifacts
+
+- [CRISC-ARCH-001 — Reference Architecture](architecture/CRISC-ARCH-001_REFERENCE_ARCHITECTURE_R0.1.md)
+- [CRISC-DATA-001 — Shared Data Model](architecture/CRISC-DATA-001_SHARED_DATA_MODEL_R0.1.md)
+- [CRISC-MAP-001 — Existing Repository Mapping](architecture/CRISC-MAP-001_REPOSITORY_MAPPING_R0.1.md)
+- [CRISC-VM-001 — Scanner-Agnostic Vulnerability Management](architecture/CRISC-VM-001_SCANNER_AGNOSTIC_VULNERABILITY_MANAGEMENT_R0.1.md)
+
+### 12.2 Cross-domain targets
+
+TPRM/CSRA (supplier inventory, due diligence, contractual controls, fourth-party/concentration risk); DLP (data movement, policy violations, investigations); Data Governance (assets, owners, classification, lineage and quality); KPI/KRI/KCI (definitions, formulas, owners, source lineage, periods, thresholds and data quality); AI Governance (inventory, use cases and oversight); AI Security Assurance (technical threat modeling/security assessment, distinct from AI governance); ESG Assurance (methodology, boundaries, evidence and estimation status); Business Resilience (BIA, dependencies and recovery objectives); scanner-agnostic Vulnerability Management (source adapters, normalized observations and correlation).
+
+Dedicated implementations for TPRM, DLP, Data Governance, ESG, AI Security and a shared cross-domain metric engine are not present in the inspected repository baseline.
+
+### 12.3 Scanner-agnostic sequence
+
+1. Preserve current CSV dashboard and document actual behavior.
+2. Validate CSV schema and sanitized fixtures.
+3. Implement Greenbone/OpenVAS XML parser as a separate adapter with synthetic/sanitized fixtures and tests.
+4. Add Tenable CSV/JSON adapters against the same canonical model.
+5. Evaluate other scanners/APIs only after source contract, security and authorization review.
+6. Add cross-scanner correlation/analytics after identity and normalization quality are measured.
+
+Tenable is not mandatory. OpenVAS/Greenbone is a candidate source, not an implemented connector.
+
+### 12.4 Delivery priorities
+
+| Priority | Focus | Required outcome |
+|---|---|---|
+| P0 | Repository reconciliation | Preserve code; align docs and maturity claims |
+| P1 | Shared model and metrics | Logical model, field mapping, metric dictionary, data quality |
+| P2 | Vulnerability and TPRM | Multi-scanner observations, CSRA and supplier assurance |
+| P3 | DLP, Data Governance, Privacy and IAM | Distinct semantics and traceable remediation |
+| P4 | AI Governance and AI Security | Separate governance and technical security assurance |
+| P5 | Resilience, ESG and intelligence | Validated indicators and accountable decision support |
+
+### 12.5 Change control
+
+Do not replace existing dashboards, code, CSV fixtures, SQLite migrations or tests without a reviewed migration plan. Preserve behavior through regression tests. Do not claim production readiness or integration until verified by repository evidence.

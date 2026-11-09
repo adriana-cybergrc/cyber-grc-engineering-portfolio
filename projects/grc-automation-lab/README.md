@@ -121,3 +121,13 @@ The next engineering iterations should prioritize:
 This project is an independent educational portfolio. It uses synthetic demonstration data and is not affiliated with or endorsed by any employer, vendor, or standards organization.
 
 Validate data quality, calculation logic, security requirements, and governance controls before adapting any component to a real operational environment.
+
+## CRISC architecture alignment
+
+The GRC Automation Lab is the current core implementation candidate for control evaluation, evidence-related findings, remediation records/history, analytics and audit-oriented reporting. Preserve its Python modules, SQLite migrations, test suite and data contracts while the CRISC shared model is mapped.
+
+The Vulnerability Management dashboard is a separate CSV/browser prototype. It is not connected to the GRC SQLite database and does not ingest scanner APIs. Future integration must use a separate normalized adapter and approved field mapping; do not couple scanner-specific fields directly to existing remediation tables.
+
+See [CRISC Reference Architecture](../../docs/architecture/CRISC-ARCH-001_REFERENCE_ARCHITECTURE_R0.1.md), [Shared Data Model](../../docs/architecture/CRISC-DATA-001_SHARED_DATA_MODEL_R0.1.md) and [Repository Mapping](../../docs/architecture/CRISC-MAP-001_REPOSITORY_MAPPING_R0.1.md).
+
+All future changes must preserve existing behavior and pass regression/integration tests.

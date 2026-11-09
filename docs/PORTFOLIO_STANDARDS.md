@@ -19,3 +19,21 @@ Every project should contain:
 
 ## Documentation language
 Use English for the main README and technical documentation to make the portfolio accessible internationally. Keep a Portuguese summary when it adds value.
+
+
+## Artifact traceability and maturity
+
+- Assign stable IDs and versions to architecture, data-model and mapping artifacts.
+- Preserve prior versions and maintain a change log.
+- Link related artifacts and evidence for implementation claims.
+- Distinguish Conceptual, Planned, In Progress, Implemented and Validated.
+- Implemented means functionality exists in the repository; Validated requires executed tests or verification evidence for the stated scope.
+- A roadmap item, diagram or connector specification is not an implementation.
+
+## Non-destructive repository changes
+
+- Inventory files before editing; prefer additive, reviewable diffs.
+- Do not replace code, datasets, dashboards, schemas or tests without migration and regression plan.
+- Keep existing demonstrations runnable.
+- Review complete diff, run tests and record results before merge.
+- Do not merge a draft PR without explicit approval.
