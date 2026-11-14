@@ -47,7 +47,31 @@ Explore the current engineering labs, demonstrations, and research initiatives.
 | [**SAP Security Lab**](projects/sap-security-lab/README.md) | SAP access governance and authorization concepts | Planned |
 | [**SAP GRC Segregation of Duties Lab**](projects/sap-grc-sod-lab/README.md) | Synthetic SoD conflict detection and review-required findings | Implemented prototype |
 | [**AI Cyber Risk Governance**](projects/ai-cyber-risk-governance/README.md) | AI risk controls and human oversight | Planned |
-| [**Cybersecurity Research**](projects/cybersecurity-research/README.md) | Research notes, technical analysis, and case studies | Planned |
+| **AI Security Research Program — ISO/IEC 27090** | Independent research tracks covering security evidence validity, model provenance and integrity, model–infrastructure security, and lifecycle assurance | Under investigation |
+| [**Cybersecurity Research**](projects/cybersecurity-research/README.md) | Central research catalog, scientific questions, research status, and links to independent research repositories | Active — research coordination |
+
+## ◈ Cybersecurity Research & Scientific Innovation
+
+The Cyber GRC Engineering portfolio also supports independent research initiatives connecting cybersecurity engineering, AI security, digital risk, and enterprise assurance.
+
+### ISO/IEC 27090 — AI Security Research Program
+
+The program investigates scientific and engineering challenges related to AI system security through independent research tracks.
+
+| Research ID | Research Track | Repository |
+|---|---|---|
+| R1 | AI Security Evidence Validity | `ai-security-evidence-validity` — planned independent repository |
+| R2 | AI Model Provenance & Integrity | `ai-model-provenance-integrity` — planned independent repository |
+| R3 | AI Model–Infrastructure Security | `ai-model-infrastructure-security` — planned independent repository |
+| R4 | Lifecycle Security Assurance | Cross-track research |
+
+**Research governance:** Each track maintains its own research questions, hypotheses, literature review, prior-art assessment, mathematical foundations, experimental protocols, results, and limitations.
+
+Scientific originality is not presumed. Proposed contributions must undergo prior-art comparison, formal analysis, counterexample testing, and reproducible validation.
+
+**Research catalog:** [Cybersecurity Research](projects/cybersecurity-research/README.md)
+
+Research repositories are independent of the existing GRC engineering labs. Their scientific results and maturity are not inferred from the implementation status of this portfolio.
 
 **Maturity principle:** a published prototype is not equivalent to a production implementation. Planned initiatives are research directions, not completed capabilities. Each project must document its current scope, limitations, and validation status.
 
